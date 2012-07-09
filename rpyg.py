@@ -12,13 +12,6 @@ from actor import *
 import pickle
 import os
 
-#~ FILENAME="/home/dodger/Dropbox/proyectos/pygame/himmh/himmh_intro.rpyg"
-
-#FILENAME="/home/dodger/Dropbox/proyectos/pygame/himmh/himmh_intro_new.rpyg"
-
-FILENAME="/home/palba/Dropbox/proyectos/pygame/rpyg/prueba.rpyg"
-
-
 class RPYG:
     def __init__(self, game_file):
         self.mode=MODE_GAME
@@ -248,6 +241,12 @@ class RPYG:
 
 
     def main(self):
+        
+        pygame.mixer.init()
+        pygame.mixer.music.load("/home/palba/tmp/1.mp3")
+        pygame.mixer.music.play()
+        
+        
         #~ pygame.display.toggle_fullscreen()
         while self.mode!=MODE_END_GAME:
             self.main_loop()

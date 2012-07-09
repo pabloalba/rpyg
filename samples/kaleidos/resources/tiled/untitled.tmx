@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="32" height="24" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name="kaleidos" tilewidth="32" tileheight="32">
+  <image source="../../../../../../../personales/rpyg2/recursos/tiled/kaleidos.png" width="288" height="1750"/>
+ </tileset>
+ <layer name="Capa de Patrones 1" width="32" height="24">
+  <data encoding="base64" compression="zlib">
+   eJxjYIAAMSAWpwOWYMAO5IFYgQ5YcdT+UftH7R+1fxjarzhqP4MFGrYEYj40TE/7LahkvyoUDzX7B0P46yNhAxrar4DDfvTwoKX9jkh2OaLxaW0/KPyVsODpQDwTiaa3/QuAeBESPRj9rwHEmhRiLTL8DwA+w1v4
+  </data>
+ </layer>
+ <layer name="Capa de patrones 2" width="32" height="24">
+  <data encoding="base64" compression="zlib">
+   eJxjYECACYyE2fhAO3HKcIKZjITZ+MAECu2nFAy0/ZSGP6WAUv+Ppj/KwFCPf0rBUPc/pemfUkBp+kcHNkB9tkBsB8T2SPQoGAXYwHBL/yMR/Btg+9kHOK4Gjf8ZoZgAAAB+TxeP
+  </data>
+ </layer>
+ <layer name="Capa de patrones 3" width="32" height="24">
+  <data encoding="base64" compression="zlib">
+   eJxjYKAuMGYkT18QUF8wEIcw4mYTA2yQ1JGiNxqoJgaIYxlxs0m1nxS9KUA1qUCcxoibTar9pOodyYBa6Q+XmYQAtdIfLjMJAWqlP1xmjoLBDWiR/kkBtEj/pABapP9RMHTAaPofuul/LhDPg+KBAMuAeDkUDzUAAKwLMn8=
+  </data>
+ </layer>
+ <layer name="Capa de patrones 4" width="32" height="24">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFgwXMYiTMHgWjgFZgNP2NgpEMRtP/KBjJYDT9jzwAALG3B0U=
+  </data>
+ </layer>
+ <layer name="Capa de patrones 5" width="32" height="24">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFgwVMZCTMHgWjgFZgNP2NgpEMRtP/KBjJYDT9jzwAAAs5Btk=
+  </data>
+ </layer>
+</map>
