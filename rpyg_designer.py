@@ -8,6 +8,8 @@ from gtk import *
 import os, math
 import gobject, cairo
 
+import zipfile
+import tempfile
 
 
 
@@ -126,14 +128,22 @@ class  RPYG_Designer:
         self.load_dialog.set_visible(False)
         filename=self.load_dialog.get_filename()
         fileObj = open(filename,"r")
-        self.game=pickle.load(fileObj)
+        try:
+            self.game=pickle.load(fileObj)
+            
+            #~ self.load_screens()
+            #~ self.load_tokens()
+            #~ self.load_items()
+            self.game_filename=filename
+            self.win_rpyg.set_title("RPyG: "+str(os.path.basename(filename)))
+            self.builder.get_object('lblGameName').set_text(str(os.path.basename(filename)))
+            self.builder.get_object('main_area').set_sensitive(True)
+        except: 
+            self.builder.get_object('main_area').set_sensitive(False)
+            self.showMessage("Error on load file")
+            
+        
         fileObj.close()
-        #~ self.load_screens()
-        #~ self.load_tokens()
-        #~ self.load_items()
-        self.game_filename=filename
-        self.win_rpyg.set_title("RPyG: "+str(os.path.basename(filename)))
-        self.builder.get_object('lblGameName').set_text(str(os.path.basename(filename)))
         
         
 
@@ -150,9 +160,27 @@ class  RPYG_Designer:
                 #~ self.save_npc()
 
         if (self.game_filename):
-            fileObj = open(self.game_filename,"w")
+            
+            #Create temp dir
+            tempDir = tempfile.mkdtemp(prefix = 'RPyG')
+            gameFile = os.path.join(tempDir, "game")
+            fileObj = open(gameFile,"w")
             pickle.dump(self.game,fileObj)
             fileObj.close()
+            
+            resourcesDir = os.path.join(tempDir, "resources")
+            os.makedirs(resourcesDir)
+                       
+            
+            #Add to zip
+            zfilename = self.game_filename
+            zout = zipfile.ZipFile(zfilename, "w")
+            zout.write(gameFile, "game")
+            zout.write(resourcesDir, "resources")
+            zout.close()
+            
+            
+            
         else:
             self.save_file_dialog(None)
     
@@ -165,6 +193,17 @@ class  RPYG_Designer:
         self.builder.get_object('lblGameName').set_text(str(os.path.basename(self.game_filename)))
         self.save_dialog.set_visible(False)
         self.save_file(None)
+        self.builder.get_object('main_area').set_sensitive(True)
+        
+        
+    def showMessage(self, text):
+        self.builder.get_object('lblMessage').set_text(text)
+        self.builder.get_object('dlgMessage').set_visible(True)
+    
+    def closeMessage(self, text):
+        self.builder.get_object('dlgMessage').set_visible(False)
+        
+        
 
 app = RPYG_Designer()
 gtk.main()

@@ -86,6 +86,10 @@ class RPYG:
         self.screen.walls=walls
         
         self.pending_moves=[]
+        
+        play_background_music("/home/palba/tmp/1.mp3")
+        
+        
 
     def load_game(self,filename):
         fileObj = open(filename,"r")
@@ -242,14 +246,10 @@ class RPYG:
 
     def main(self):
         
-        pygame.mixer.init()
-        pygame.mixer.music.load("/home/palba/tmp/1.mp3")
-        pygame.mixer.music.play()
-        
-        
-        #~ pygame.display.toggle_fullscreen()
         while self.mode!=MODE_END_GAME:
             self.main_loop()
+            
+        pygame.mixer.quit()
         #~ pygame.display.toggle_fullscreen()
         pygame.display.quit()
         

@@ -26,7 +26,10 @@ def load_image(filename, transparent=False):
                 image.set_colorkey(color, RLEACCEL)
         return image
         
-        
+def play_background_music(soundfile):
+    pygame.mixer.init()
+    pygame.mixer.music.load(soundfile)
+    pygame.mixer.music.play(-1)
 
 
 def play_sound(soundfile):
