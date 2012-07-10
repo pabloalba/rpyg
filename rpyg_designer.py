@@ -119,7 +119,6 @@ class  RPYG_Designer:
 
 
 
-        self.screen_list = []
         self.liststore_maps = None
         self.screen = None
         self.game = Game()
@@ -145,15 +144,10 @@ class  RPYG_Designer:
         liststore = gtk.ListStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING)
 
 
-        forest  = self.load_image("samples/forest/resources/maps/forest.png", 144, 90)
-        add_icon = iconview.render_icon("gtk-add", gtk.ICON_SIZE_BUTTON)
 
-        scaled_add_icon = add_icon.scale_simple(32,32,gtk.gdk.INTERP_BILINEAR)
+        add_icon = self.load_image("images/add_map.png", 144, 90)
 
-        liststore.append([forest, "forest1"])
-        liststore.append([forest, "forest2"])
-        liststore.append([forest, "forest3"])
-        liststore.append([scaled_add_icon, "Add map"])
+        liststore.append([add_icon, "Add map"])
 
         iconview.set_model(liststore)
         self.liststore_maps = liststore
@@ -166,14 +160,33 @@ class  RPYG_Designer:
         self.win_rpyg.show_all()
 
     def on_icon_map_clicked(self, iconview):
+        self.win_rpyg.show_all()
         selected = iconview.get_selected_items()
         if (len(selected) == 1):
             pos = selected[0][0]
-            #if it is the last icon, open add dialog
-            if (len(self.liststore_maps) == pos+1):
-                self.open_file_dialog(None)
+            #if it is the first icon, open add dialog
+            if (pos == 0):
+                self.open_map_dialog(None)
+            else:
+                self.load_screen(pos-1)
 
+    def load_screen(self, pos):
+        screen = self.game.screens[pos]
+        self.load_map_image("samples/forest/resources/maps/forest.png")
 
+    def open_map_dialog(self,button):
+        self.builder.get_object('load_map_dialog').set_visible(True)
+
+    def on_open_map_select(self,dialog):
+        dialog = self.builder.get_object('load_map_dialog')
+        dialog.set_visible(False)
+        filename=dialog.get_filename()
+        #Create new screen
+        screen_name = str(os.path.basename(filename))
+        self.game.add_screen(screen_name)
+        screen_icon  = self.load_image(filename, 144, 90)
+        self.liststore_maps.append([screen_icon, screen_name])
+        self.win_rpyg.show_all()
 
 
     def exit_rpyg(self,window):
@@ -195,7 +208,6 @@ class  RPYG_Designer:
             #~ self.load_items()
             self.game_filename=filename
             self.win_rpyg.set_title("RPyG: "+str(os.path.basename(filename)))
-            self.builder.get_object('lblGameName').set_text(str(os.path.basename(filename)))
             self.builder.get_object('main_area').set_sensitive(True)
         except:
             self.builder.get_object('main_area').set_sensitive(False)
@@ -249,7 +261,6 @@ class  RPYG_Designer:
         if (not self.game_filename.endswith('.rpyg')):
             self.game_filename+='.rpyg'
         self.win_rpyg.set_title("RPyG: "+str(os.path.basename(self.game_filename)))
-        self.builder.get_object('lblGameName').set_text(str(os.path.basename(self.game_filename)))
         self.save_dialog.set_visible(False)
         self.save_file(None)
         self.builder.get_object('main_area').set_sensitive(True)
@@ -263,7 +274,7 @@ class  RPYG_Designer:
         self.builder.get_object('dlgMessage').set_visible(False)
 
     def load_map_image(self, file_name):
-        scaled_buf = self.load_image(file_name, 640, 480)
+        scaled_buf = self.load_image(file_name, 400, 250)
         self.builder.get_object('img_map').set_from_pixbuf(scaled_buf)
 
     def load_image(self, file_name, width=-1, height=-1):

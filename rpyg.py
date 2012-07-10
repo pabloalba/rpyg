@@ -17,21 +17,21 @@ class RPYG:
         self.mode=MODE_GAME
         self.background_game=None
         self.protagonist=None
-        
+
 
         self.display = pygame.display.set_mode((WIDTH, HEIGHT))
         self.display_copy=None
-        pygame.display.set_caption('RPyG')    
+        pygame.display.set_caption('RPyG')
         pygame.font.init()
         self.load_game(game_file)
-        
-        
+
+
         for item in self.game.items:
             item.init_display()
         self.clock = pygame.time.Clock()
         self.dialog=None
         self.load_screen(self.game)
-        
+
     def load_screen(self,game,name=''):
         inventory=None
         spawn_pos=None
@@ -41,8 +41,8 @@ class RPYG:
                 inventory=self.protagonist.inventory
                 tokens=self.protagonist.tokens
             spawn_pos=self.protagonist.exit_activate.spawn_pos
-            
-        
+
+
         self.screen=None
         if (name):
             for s in game.screens:
@@ -50,24 +50,24 @@ class RPYG:
                     self.screen=s
         else:
             self.screen=game.screens[0]
-            
+
         self.background_game=load_image(self.screen.map_file, False)
         self.protagonist=self.screen.protagonist
         if inventory==None:
             inventory=Inventory(self.protagonist)
-            
+
         if spawn_pos:
             self.protagonist.pos=[int(spawn_pos[0]),int(spawn_pos[1])]
-        
+
         self.protagonist.inventory=inventory
         self.protagonist.tokens=tokens
         self.protagonist.exit_activate=None
         self.protagonist.init_display()
         for npc in self.screen.npcs:
             npc.init_display()
-        
+
         self.protagonist.inventory.init_display()
-            
+
         #walls
         walls=[]
         num=0
@@ -84,19 +84,19 @@ class RPYG:
             num_column=0
             num_row+=1
         self.screen.walls=walls
-        
+
         self.pending_moves=[]
-        
-        play_background_music("/home/palba/tmp/1.mp3")
-        
-        
+
+        #play_background_music("/home/palba/tmp/1.mp3")
+
+
 
     def load_game(self,filename):
         fileObj = open(filename,"r")
         self.game=pickle.load(fileObj)
         fileObj.close()
-    
-    
+
+
     def end_dialog(self):
         self.mode=MODE_GAME
         for result in self.dialog.results:
@@ -120,9 +120,9 @@ class RPYG:
                 self.mode=MODE_CUT_SCENE
             elif result.result_type=='RESULT_END_GAME':
                 self.mode=MODE_END_GAME
-        
-                
-    
+
+
+
     def process(self,events):
         for event in events:
             if event.type == QUIT:
@@ -141,10 +141,10 @@ class RPYG:
                     for token in self.protagonist.tokens:
                         print "TOKEN: "+token
                 if event.key==K_f:
-                    pygame.display.toggle_fullscreen() 
-            
-                        
-    
+                    pygame.display.toggle_fullscreen()
+
+
+
     def process_cut_scene(self,time):
         if self.protagonist.npc_interact:
             if len(self.pending_moves)>0:
@@ -155,7 +155,7 @@ class RPYG:
                     self.screen.npcs.remove(self.protagonist.npc_interact)
                 else:
                     self.protagonist.npc_interact.look_down()
-                
+
                 self.protagonist.npc_interact=None
                 self.mode=MODE_GAME
 
@@ -197,24 +197,24 @@ class RPYG:
                             #~ playmusic2(SOUND_COMBINE)
                             pass
 
-    
+
     def main_loop(self):
         #~ print "loop"
         events=pygame.event.get()
         time = self.clock.tick(25)
-        
+
         if self.mode==MODE_GAME or self.mode==MODE_FIRST_DIALOG:
             self.process(events)
             if self.protagonist.exit_activate != None:
                 self.load_screen(self.game,self.protagonist.exit_activate.screen)
             else:
-                keys = pygame.key.get_pressed()  
+                keys = pygame.key.get_pressed()
                 self.protagonist.move(time, keys, self.screen.npcs)
-                self.display.blit(self.background_game, (0, 0))        
-                
+                self.display.blit(self.background_game, (0, 0))
+
                 for npc in self.screen.npcs:
                     npc.draw(self.display)
-                    
+
                 for e in self.screen.exits:
                     e_rect=Rect(int(e.pos[0])*32,int(e.pos[1])*32,32,32)
                     pygame.draw.rect(self.display, (255, 0, 0), e_rect)
@@ -228,33 +228,33 @@ class RPYG:
                 self.end_dialog()
         elif self.mode==MODE_CUT_SCENE or self.mode==MODE_CUT_SCENE_REMOVE:
             self.process_cut_scene(time)
-            self.display.blit(self.background_game, (0, 0))  
+            self.display.blit(self.background_game, (0, 0))
             self.protagonist.draw(self.display)
             for npc in self.screen.npcs:
                 npc.draw(self.display)
         elif self.mode==MODE_INVENTORY:
             self.process_inventory(events)
             self.protagonist.inventory.draw(self.display)
-        
+
         if self.mode==MODE_FIRST_DIALOG:
                 self.mode=MODE_TALK
-        
+
         pygame.display.flip()
 
 
 
 
     def main(self):
-        
+
         while self.mode!=MODE_END_GAME:
             self.main_loop()
-            
+
         pygame.mixer.quit()
         #~ pygame.display.toggle_fullscreen()
         pygame.display.quit()
-        
-        
+
+
 if len(sys.argv)>1:
-    game_file=sys.argv[1]        
-    rpyg=RPYG(game_file)        
+    game_file=sys.argv[1]
+    rpyg=RPYG(game_file)
     rpyg.main()
