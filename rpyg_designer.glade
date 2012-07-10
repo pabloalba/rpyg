@@ -12,6 +12,17 @@
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
         <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox" id="dialog-action_area1">
+            <property name="can_focus">False</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
         <child>
           <object class="GtkLabel" id="lblMessage">
             <property name="visible">True</property>
@@ -228,7 +239,7 @@
                 <property name="can_focus">False</property>
                 <child>
                   <object class="GtkScrolledWindow" id="maps_scroll">
-                    <property name="width_request">1024</property>
+                    <property name="width_request">1023</property>
                     <property name="height_request">150</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
@@ -272,86 +283,206 @@
                     <property name="sensitive">False</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkExpander" id="expander1">
+                      <object class="GtkEventBox" id="box_prot_title">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="border_width">1</property>
                         <child>
-                          <object class="GtkFixed" id="fixed5">
-                            <property name="height_request">200</property>
+                          <object class="GtkExpander" id="expander1">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="expanded">True</property>
                             <child>
-                              <object class="GtkLabel" id="label4">
-                                <property name="width_request">100</property>
-                                <property name="height_request">20</property>
+                              <object class="GtkEventBox" id="box_prot">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Name: </property>
+                                <property name="border_width">2</property>
+                                <child>
+                                  <object class="GtkFixed" id="fixed5">
+                                    <property name="height_request">135</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <child>
+                                      <object class="GtkLabel" id="label5">
+                                        <property name="width_request">100</property>
+                                        <property name="height_request">20</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="xalign">0</property>
+                                        <property name="label" translatable="yes">Name: </property>
+                                      </object>
+                                      <packing>
+                                        <property name="x">25</property>
+                                        <property name="y">5</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkEntry" id="prot_name">
+                                        <property name="width_request">250</property>
+                                        <property name="height_request">20</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="invisible_char">•</property>
+                                      </object>
+                                      <packing>
+                                        <property name="x">25</property>
+                                        <property name="y">25</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="label1">
+                                        <property name="height_request">20</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="label" translatable="yes">Image for dialogs</property>
+                                      </object>
+                                      <packing>
+                                        <property name="x">450</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="label2">
+                                        <property name="height_request">20</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="label" translatable="yes">Character</property>
+                                      </object>
+                                      <packing>
+                                        <property name="x">335</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkButton" id="btn_prot_image_dialogs">
+                                        <property name="use_action_appearance">False</property>
+                                        <property name="width_request">96</property>
+                                        <property name="height_request">96</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">True</property>
+                                        <property name="use_action_appearance">False</property>
+                                        <signal name="clicked" handler="btn_prot_image_dialogs_clicked" swapped="no"/>
+                                      </object>
+                                      <packing>
+                                        <property name="x">461</property>
+                                        <property name="y">20</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkButton" id="btn_prot_image_chara">
+                                        <property name="use_action_appearance">False</property>
+                                        <property name="width_request">96</property>
+                                        <property name="height_request">96</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">True</property>
+                                        <property name="use_action_appearance">False</property>
+                                        <signal name="clicked" handler="btn_prot_image_chara_clicked" swapped="no"/>
+                                      </object>
+                                      <packing>
+                                        <property name="x">320</property>
+                                        <property name="y">20</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkButton" id="btn_prot_map">
+                                        <property name="label" translatable="yes">Select in map</property>
+                                        <property name="use_action_appearance">False</property>
+                                        <property name="height_request">32</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">True</property>
+                                        <property name="use_action_appearance">False</property>
+                                        <signal name="clicked" handler="btn_prot_map_clicked" swapped="no"/>
+                                      </object>
+                                      <packing>
+                                        <property name="x">25</property>
+                                        <property name="y">85</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="label3">
+                                        <property name="height_request">20</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="xalign">0</property>
+                                        <property name="label" translatable="yes">Initial coordinates</property>
+                                      </object>
+                                      <packing>
+                                        <property name="x">25</property>
+                                        <property name="y">60</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="label4">
+                                        <property name="width_request">20</property>
+                                        <property name="height_request">20</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="xalign">0</property>
+                                        <property name="label" translatable="yes">X:</property>
+                                      </object>
+                                      <packing>
+                                        <property name="x">150</property>
+                                        <property name="y">94</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="label9">
+                                        <property name="width_request">20</property>
+                                        <property name="height_request">20</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="xalign">0</property>
+                                        <property name="label" translatable="yes">Y:</property>
+                                      </object>
+                                      <packing>
+                                        <property name="x">220</property>
+                                        <property name="y">94</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkEntry" id="prot_x">
+                                        <property name="width_request">30</property>
+                                        <property name="height_request">20</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="invisible_char">•</property>
+                                        <signal name="changed" handler="update_prot_coordinates" swapped="no"/>
+                                      </object>
+                                      <packing>
+                                        <property name="x">170</property>
+                                        <property name="y">94</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkEntry" id="prot_y">
+                                        <property name="width_request">30</property>
+                                        <property name="height_request">20</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="invisible_char">•</property>
+                                        <signal name="changed" handler="update_prot_coordinates" swapped="no"/>
+                                      </object>
+                                      <packing>
+                                        <property name="x">240</property>
+                                        <property name="y">94</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                </child>
                               </object>
-                              <packing>
-                                <property name="x">29</property>
-                                <property name="y">150</property>
-                              </packing>
                             </child>
-                            <child>
-                              <object class="GtkEntry" id="prot_name">
-                                <property name="width_request">390</property>
-                                <property name="height_request">20</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="invisible_char">•</property>
-                              </object>
-                              <packing>
-                                <property name="x">120</property>
-                                <property name="y">150</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkImage" id="image1">
-                                <property name="width_request">32</property>
-                                <property name="height_request">32</property>
+                            <child type="label">
+                              <object class="GtkLabel" id="label_prot">
+                                <property name="width_request">573</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="stock">gtk-missing-image</property>
+                                <property name="margin_top">4</property>
+                                <property name="margin_bottom">4</property>
+                                <property name="xalign">0</property>
+                                <property name="label" translatable="yes">PROTAGONIST</property>
                               </object>
-                              <packing>
-                                <property name="x">51</property>
-                                <property name="y">23</property>
-                              </packing>
                             </child>
-                            <child>
-                              <object class="GtkLabel" id="label5">
-                                <property name="width_request">100</property>
-                                <property name="height_request">20</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Chara:</property>
-                              </object>
-                              <packing>
-                                <property name="x">29</property>
-                                <property name="y">10</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkFileChooserButton" id="prot_chara">
-                                <property name="width_request">200</property>
-                                <property name="height_request">20</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="orientation">vertical</property>
-                              </object>
-                              <packing>
-                                <property name="x">136</property>
-                                <property name="y">16</property>
-                              </packing>
-                            </child>
-                          </object>
-                        </child>
-                        <child type="label">
-                          <object class="GtkLabel" id="label1">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Protagonist</property>
                           </object>
                         </child>
                       </object>
@@ -362,17 +493,33 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkExpander" id="expander2">
+                      <object class="GtkEventBox" id="box_npcs_title">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="border_width">1</property>
                         <child>
-                          <placeholder/>
-                        </child>
-                        <child type="label">
-                          <object class="GtkLabel" id="label2">
+                          <object class="GtkExpander" id="expander2">
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">NPCs</property>
+                            <property name="can_focus">True</property>
+                            <child>
+                              <object class="GtkEventBox" id="box_npcs">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <child>
+                                  <object class="GtkFixed" id="fixed7">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                            <child type="label">
+                              <object class="GtkLabel" id="label_npcs">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">NPCs</property>
+                              </object>
+                            </child>
                           </object>
                         </child>
                       </object>
@@ -383,17 +530,33 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkExpander" id="expander3">
+                      <object class="GtkEventBox" id="box_exits_title">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="border_width">1</property>
                         <child>
-                          <placeholder/>
-                        </child>
-                        <child type="label">
-                          <object class="GtkLabel" id="label3">
+                          <object class="GtkExpander" id="expander3">
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Roads and Exits</property>
+                            <property name="can_focus">True</property>
+                            <child>
+                              <object class="GtkEventBox" id="eventbox1">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <child>
+                                  <object class="GtkFixed" id="box_exits">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                            <child type="label">
+                              <object class="GtkLabel" id="label_exits">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">EXITS</property>
+                              </object>
+                            </child>
                           </object>
                         </child>
                       </object>
@@ -513,7 +676,7 @@
                                 <signal name="clicked" handler="on_btn_edit_paths_clicked" swapped="no"/>
                               </object>
                               <packing>
-                                <property name="x">12</property>
+                                <property name="x">58</property>
                                 <property name="y">134</property>
                               </packing>
                             </child>
@@ -529,7 +692,7 @@ Right button inverts selection.</property>
                                 <property name="stock">gtk-dialog-question</property>
                               </object>
                               <packing>
-                                <property name="x">215</property>
+                                <property name="x">282</property>
                                 <property name="y">133</property>
                               </packing>
                             </child>
@@ -541,8 +704,11 @@ Right button inverts selection.</property>
                       <object class="GtkLabel" id="label6">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">  Screen Properties  </property>
+                        <property name="label" translatable="yes"> SCREEN PROPERTIES </property>
                         <property name="use_markup">True</property>
+                        <attributes>
+                          <attribute name="background" value="#d3d3d3d3d3d3"/>
+                        </attributes>
                       </object>
                     </child>
                   </object>

@@ -32,14 +32,17 @@ class MapScreen(gtk.DrawingArea):
         self.imagepath=imagepath
         self.cr=None
         self.screen=screen
+        self.mark_x = -1
+        self.mark_y = -1
 
 
 
     # Handle the expose-event by drawing
     def do_expose_event(self, event):
-
-        # Create the cairo context
-        cr = self.window.cairo_create()
+        if (not self.cr):
+            # Create the cairo context
+            self.cr = self.window.cairo_create()
+        cr = self.cr
 
         # Restrict Cairo to the exposed area; avoid extra work
         cr.rectangle(event.area.x, event.area.y,
@@ -77,6 +80,15 @@ class MapScreen(gtk.DrawingArea):
                     cr.rectangle(x*16, y*16, 16, 16)
                     cr.fill()
 
+        #mark
+        if (self.mark_x > -1) and (self.mark_y > -1):
+            cr.set_source_rgba(1, 1, 0, 0.5)
+            cr.rectangle(self.mark_x*32, self.mark_y*32, 32, 32)
+            cr.fill()
+
+
+
+
     def repaint(self):
          cr = self.window.cairo_create()
          self.draw_image(cr)
@@ -100,6 +112,31 @@ class  RPYG_Designer:
         #~ self.item=None
         #~ self.npc=None
         #~ self.dialog=None
+
+        self.win_rpyg.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("lightgray"))
+
+        self.builder.get_object('box_prot_title').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color('#606060'))
+        self.builder.get_object('label_prot').modify_fg(gtk.STATE_NORMAL, gtk.gdk.Color('#ffffff'))
+        self.builder.get_object('box_prot').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color("#A0A0A0"))
+
+        self.builder.get_object('box_npcs_title').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color('#606060'))
+        self.builder.get_object('label_npcs').modify_fg(gtk.STATE_NORMAL, gtk.gdk.Color('#ffffff'))
+        self.builder.get_object('box_npcs').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color("#A0A0A0"))
+
+        self.builder.get_object('box_exits_title').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color('#606060'))
+        self.builder.get_object('label_exits').modify_fg(gtk.STATE_NORMAL, gtk.gdk.Color('#ffffff'))
+        self.builder.get_object('box_exits').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color("#A0A0A0"))
+
+
+
+        self.builder.get_object('box_npcs').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color("#D3D3D3"))
+        self.builder.get_object('box_exits').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color("#D3D3D3"))
+        self.builder.get_object('main_area').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color("#D3D3D3"))
+
+        icon  = self.load_image("./images/pos_map.png", 16, 16)
+        image = gtk.image_new_from_pixbuf(icon)
+        self.builder.get_object('btn_prot_map').set_image(image)
+
 
 
 
@@ -192,7 +229,76 @@ class  RPYG_Designer:
             self.builder.get_object('iconview_maps').select_path((pos,))
             self.load_screen(pos-1)
 
+    def btn_prot_image_dialogs_clicked(self, button):
+        filename = self.open_file('*.png')
+        if (filename):
+            self.screen.protagonist.img_file = filename
+            icon  = self.load_image(filename, 90)
+            image = gtk.image_new_from_pixbuf(icon)
+            button.set_image(image)
 
+
+
+    def btn_prot_image_chara_clicked(self, button):
+        filename = self.open_file('*.png')
+        if (filename):
+
+            pixbuf = gtk.gdk.pixbuf_new_from_file(filename)
+            #Get size
+            width = pixbuf.get_width()
+            height = pixbuf.get_height()
+            self.screen.protagonist.max_rows = width / 32
+            self.screen.protagonist.max_cols = height / 48
+
+
+            self.screen.protagonist.img_dialog = filename
+
+            image = gtk.image_new_from_pixbuf(pixbuf.subpixbuf(0, 0, 32, 48))
+            button.set_image(image)
+
+
+
+    def btn_prot_map_clicked(self, button):
+        filepath=self.screen.map_file
+        if (filepath):
+            drawing_area = gtk.DrawingArea()
+            map_screen = MapScreen(filepath,self.screen)
+            map_screen.show()
+            map_screen.connect("button_press_event", self.on_prot_map_clicked)
+            map_screen.set_events(gtk.gdk.BUTTON_PRESS_MASK)
+            win_map = self.builder.get_object('win_map')
+
+            try:
+                x = int(self.builder.get_object('prot_x').get_text())
+                y = int(self.builder.get_object('prot_y').get_text())
+
+                map_screen.mark_x = x
+                map_screen.mark_y = y
+            except:
+                pass
+
+            win_map.add(map_screen)
+            win_map.set_size_request(1024, 768)
+            win_map.set_visible(True)
+
+    def on_prot_map_clicked(self,screenmap,event):
+        if event.button==1:
+            x=int(math.floor(event.x/32))
+            y=int(math.floor(event.y/32))
+            self.builder.get_object('prot_x').set_text(str(x))
+            self.builder.get_object('prot_y').set_text(str(y))
+            self.builder.get_object('win_map').destroy()
+            pos = [x, y]
+            self.screen.protagonist.pos = pos
+
+    def update_prot_coordinates(self, fiels):
+        try:
+            x = int(self.builder.get_object('prot_x').get_text())
+            y = int(self.builder.get_object('prot_y').get_text())
+            pos = [x, y]
+            self.screen.protagonist.pos = pos
+        except:
+            pass
 
 
 
@@ -360,6 +466,9 @@ class  RPYG_Designer:
     def load_image(self, file_name, width=-1, height=-1):
         pixbuf = gtk.gdk.pixbuf_new_from_file(file_name)
         if (width != -1):
+            if (height == -1):
+                #calc height
+                height = pixbuf.get_height() * width / pixbuf.get_width()
             scaled_buf = pixbuf.scale_simple(width,height,gtk.gdk.INTERP_BILINEAR)
             return scaled_buf
         else:
