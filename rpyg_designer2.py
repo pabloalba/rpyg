@@ -57,13 +57,13 @@ class MapScreen(gtk.DrawingArea):
             cr.rectangle(x*32, 0, 1, 768)
             x+=1
             cr.fill()
-            
+
         while (y<=24):
             cr.rectangle(0,y*32, 1024, 1)
             y+=1
             cr.fill()
-            
-        
+
+
 
         #Marked Path
         cr.set_source_rgba(0, 0, 1, 0.5)
@@ -356,11 +356,11 @@ class  RPYG_Designer:
         if (self.item):
             combine_item=get_active_value(self.builder.get_object('cmb_combine_item'))
             list=get_list_values(self.builder.get_object('list_combination_result'))
-            
+
             remove_token=get_active_value(self.builder.get_object('cmb_comb_remove_token'))
             add_token=get_active_value(self.builder.get_object('cmb_comb_add_token'))
-            
-            
+
+
             self.item.add_combination(combine_item,list, add_token, remove_token)
             self.builder.get_object('list_combinations').append([combine_item,str(list)])
 
@@ -535,7 +535,7 @@ class  RPYG_Designer:
 
     def on_btn_dialogs_clicked(self,button):
         self.win_dialog.set_visible(True)
-        
+
     def on_btn_close_dialogs_clicked(self,button):
         self.win_dialog.set_visible(False)
 
@@ -608,16 +608,16 @@ class  RPYG_Designer:
         if (value):
             self.dialog.remove_phrase(value)
             self.load_phrases()
-            
-            
+
+
     def on_btn_edit_phrase_clicked(self,button):
         value=get_selected_value(self.builder.get_object('tree_phrase'))
         if (value):
             self.builder.get_object('entry_phrase_edit').set_text(value)
             self.builder.get_object('win_edit_phrase').set_visible(True)
-            
-            
-            
+
+
+
     def on_win_edit_phrase_ok_clicked(self,button):
         old_value=get_selected_value(self.builder.get_object('tree_phrase'))
         value=self.builder.get_object('entry_phrase_edit').get_text()
@@ -627,8 +627,8 @@ class  RPYG_Designer:
         self.builder.get_object('win_edit_phrase').set_visible(False)
         self.builder.get_object('entry_phrase_edit').set_text('')
         self.load_phrases()
-        
-    
+
+
     def on_win_edit_phrase_cancel_clicked(self,button):
         self.builder.get_object('win_edit_phrase').set_visible(False)
         self.builder.get_object('entry_phrase_edit').set_text('')

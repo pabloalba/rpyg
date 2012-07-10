@@ -92,13 +92,9 @@ class  RPYG_Designer:
         self.builder.connect_signals(self)
 
         self.game_filename=''
+        self.game_dir=''
 
         self.win_rpyg=self.builder.get_object('win_rpyg')
-        self.load_dialog=self.builder.get_object('load_dialog')
-        self.save_dialog=self.builder.get_object('save_dialog')
-        self.builder.get_object('filefilter').add_pattern("*.rpyg");
-        self.builder.get_object('pngfilter').add_pattern("*.png");
-        self.builder.get_object('oggfilter').add_pattern("*.ogg");
 
 
         #~ self.win_add_screen = self.builder.get_object('win_add_screen')
@@ -175,53 +171,68 @@ class  RPYG_Designer:
         self.load_map_image("samples/forest/resources/maps/forest.png")
 
     def open_map_dialog(self,button):
-        self.builder.get_object('load_map_dialog').set_visible(True)
-
-    def on_open_map_select(self,dialog):
-        dialog = self.builder.get_object('load_map_dialog')
-        dialog.set_visible(False)
-        filename=dialog.get_filename()
-        #Create new screen
-        screen_name = str(os.path.basename(filename))
-        self.game.add_screen(screen_name)
-        screen_icon  = self.load_image(filename, 144, 90)
-        self.liststore_maps.append([screen_icon, screen_name])
-        self.win_rpyg.show_all()
+        filename = self.open_file('*.png')
+        if (filename):
+            #Create new screen
+            screen_name = str(os.path.basename(filename))
+            self.game.add_screen(screen_name)
+            screen_icon  = self.load_image(filename, 144, 90)
+            self.liststore_maps.append([screen_icon, screen_name])
+            self.win_rpyg.show_all()
 
 
     def exit_rpyg(self,window):
         exit()
 
 
-    def open_file_dialog(self,button):
-        self.load_dialog.set_visible(True)
+    def open_game(self,button):
+        filename = self.open_file('*.rpyg')
+        if (filename):
 
-    def open_file(self,dialog):
-        self.load_dialog.set_visible(False)
-        filename=self.load_dialog.get_filename()
-        fileObj = open(filename,"r")
-        try:
-            self.game=pickle.load(fileObj)
-
-            #~ self.load_screens()
-            #~ self.load_tokens()
-            #~ self.load_items()
-            self.game_filename=filename
-            self.win_rpyg.set_title("RPyG: "+str(os.path.basename(filename)))
-            self.builder.get_object('main_area').set_sensitive(True)
-        except:
-            self.builder.get_object('main_area').set_sensitive(False)
-            self.showMessage("Error on load file")
+            #Extract zip to temp dir
+            tempDir = tempfile.mkdtemp(prefix = 'RPyG')
+            zf = zipfile.ZipFile(filename)
 
 
-        fileObj.close()
+            # extract files to directory structure
+            for i, name in enumerate(zf.namelist()):
+                if not name.endswith('/'):
+                    outfile = open(os.path.join(tempDir, name), 'wb')
+                    outfile.write(zf.read(name))
+                    outfile.flush()
+                    outfile.close()
 
 
 
-    def save_file_dialog(self,button):
-        self.save_dialog.set_visible(True)
+            game_file = os.path.join(tempDir, "game")
+            fileObj = open(game_file,"r")
+            try:
+                self.game=pickle.load(fileObj)
 
-    def save_file(self,button):
+                #~ self.load_screens()
+                #~ self.load_tokens()
+                #~ self.load_items()
+                self.game_filename=game_file
+                self.game_dir=tempDir
+                self.win_rpyg.set_title("RPyG Designer: "+str(os.path.basename(filename)))
+                self.builder.get_object('main_area').set_sensitive(True)
+            except:
+                self.builder.get_object('main_area').set_sensitive(False)
+                self.showMessage("Error on load file")
+
+
+            fileObj.close()
+
+
+
+    def save_game_as(self,button):
+        self.game_filename = self.save_file('*.rpyg')
+        if (self.game_filename):
+            if (not self.game_filename.endswith('.rpyg')):
+                self.game_filename+='.rpyg'
+            self.save_game(None)
+
+    def save_game(self,button):
         #~ if (self.screen):
             #~ self.save_screen()
             #~ self.save_protagonist()
@@ -231,16 +242,21 @@ class  RPYG_Designer:
                 #~ self.save_npc()
 
         if (self.game_filename):
-
             #Create temp dir
-            tempDir = tempfile.mkdtemp(prefix = 'RPyG')
+            if (self.game_dir):
+                tempDir = self.game_dir
+            else:
+                tempDir = tempfile.mkdtemp(prefix = 'RPyG')
+                self.game_dir = tempDir
             gameFile = os.path.join(tempDir, "game")
             fileObj = open(gameFile,"w")
             pickle.dump(self.game,fileObj)
             fileObj.close()
 
             resourcesDir = os.path.join(tempDir, "resources")
-            os.makedirs(resourcesDir)
+            if (not os.path.exists(resourcesDir)):
+                os.makedirs(resourcesDir)
+
 
 
             #Add to zip
@@ -251,18 +267,18 @@ class  RPYG_Designer:
             zout.close()
 
 
+            self.win_rpyg.set_title("RPyG Designer: "+str(os.path.basename(self.game_filename)))
 
         else:
-            self.save_file_dialog(None)
+            self.save_game_as(None)
 
 
     def on_save_as_clicked(self,button):
         self.game_filename=self.save_dialog.get_filename()
         if (not self.game_filename.endswith('.rpyg')):
             self.game_filename+='.rpyg'
-        self.win_rpyg.set_title("RPyG: "+str(os.path.basename(self.game_filename)))
-        self.save_dialog.set_visible(False)
-        self.save_file(None)
+        self.win_rpyg.set_title("RPyG Designer: "+str(os.path.basename(self.game_filename)))
+        self.save_game(None)
         self.builder.get_object('main_area').set_sensitive(True)
 
 
@@ -284,6 +300,35 @@ class  RPYG_Designer:
             return scaled_buf
         else:
             return pixbuf
+
+
+    def open_file(self, pattern):
+        dialog = gtk.FileChooserDialog(title="RPyG: Open File",action=gtk.FILE_CHOOSER_ACTION_OPEN, buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
+        filter = gtk.FileFilter()
+        filter.set_name(pattern)
+        filter.add_pattern(pattern)
+        dialog.add_filter(filter)
+        response = dialog.run()
+        file_name = None
+        if response == gtk.RESPONSE_OK:
+            file_name = dialog.get_filename()
+        dialog.destroy()
+        return file_name
+
+    def save_file(self, pattern):
+        dialog = gtk.FileChooserDialog(title="RPyG: Save File",action=gtk.FILE_CHOOSER_ACTION_SAVE, buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_SAVE,gtk.RESPONSE_OK))
+
+        filter = gtk.FileFilter()
+        filter.set_name(pattern)
+        filter.add_pattern(pattern)
+
+        dialog.add_filter(filter)
+        response = dialog.run()
+        file_name = None
+        if response == gtk.RESPONSE_OK:
+            file_name = dialog.get_filename()
+        dialog.destroy()
+        return file_name
 
 
 
