@@ -97,18 +97,6 @@ class  RPYG_Designer:
         self.win_rpyg=self.builder.get_object('win_rpyg')
 
 
-        #~ self.win_add_screen = self.builder.get_object('win_add_screen')
-        #~ self.win_add_token = self.builder.get_object('win_add_token')
-        #~ self.win_add_item = self.builder.get_object('win_add_item')
-        #~ self.win_add_npc = self.builder.get_object('win_add_npc')
-        #~ self.win_dialog = self.builder.get_object('win_dialog')
-        #~ self.win_map = self.builder.get_object('win_map')
-
-
-
-        #~ self.datos_screen=self.builder.get_object('datos_screen')
-        #~
-
         #~ self.item=None
         #~ self.npc=None
         #~ self.dialog=None
@@ -167,25 +155,57 @@ class  RPYG_Designer:
                 self.load_screen(pos-1)
 
     def load_screen(self, pos):
-        screen = self.game.screens[pos]
-        self.load_map_image("samples/forest/resources/maps/forest.png")
+        self.screen = self.game.screens[pos]
+        self.load_map_image(self.screen.map_file)
+        self.builder.get_object('screen_box').set_sensitive(True)
+        self.builder.get_object('screen_properties').set_sensitive(True)
+        self.builder.get_object('txt_screen_name').set_text(self.screen.name)
+        self.builder.get_object('txt_screen_music').set_text(str(os.path.basename(self.screen.music_file)))
+
 
     def open_map_dialog(self,button):
         filename = self.open_file('*.png')
         if (filename):
             #Create new screen
-            screen_name = str(os.path.basename(filename))
-            self.game.add_screen(screen_name)
+            screen_name = str(os.path.basename(filename))[0:-4]
+
+            #Search more screens with same name
+            num = 0
+            for s in self.game.screens:
+                if s.name.startswith(screen_name):
+                    num += 1
+            if (num > 0):
+                screen_name += str(num)
+
+            screen = self.game.add_screen(screen_name)
+            screen.map_file = filename
+
             screen_icon  = self.load_image(filename, 144, 90)
             self.liststore_maps.append([screen_icon, screen_name])
+
+            #resize iconview
+            self.builder.get_object('iconview_maps').set_size_request(200*len(self.game.screens),90)
+
             self.win_rpyg.show_all()
+            #Select last element
+            pos = len(self.game.screens)
+            self.builder.get_object('iconview_maps').select_path((pos,))
+            self.load_screen(pos-1)
+
+
+
 
 
     def exit_rpyg(self,window):
         exit()
 
 
+    def clear_current():
+        self.builder.get_object('screen_box').set_sensitive(False)
+        self.builder.get_object('screen_properties').set_sensitive(False)
+
     def open_game(self,button):
+        clear_current()
         filename = self.open_file('*.rpyg')
         if (filename):
 
@@ -282,6 +302,50 @@ class  RPYG_Designer:
         self.builder.get_object('main_area').set_sensitive(True)
 
 
+
+    def screen_name_change(self, field):
+        self.screen.name = field.get_text()
+
+    def screen_music_select(self, button):
+        filename = self.open_file ("*.ogg *.mp3")
+        if (filename):
+            self.screen.music_file = filename
+            self.builder.get_object('txt_screen_music').set_text(str(os.path.basename(self.screen.music_file)))
+
+    ############ Maps & Music
+
+    def on_map_screen_clicked(self,screenmap,event):
+        if event.button==1:
+            x=int(math.floor(event.x/16))
+            y=int(math.floor(event.y/16))
+            self.screen.update_path(x,y)
+            screenmap.repaint()
+        elif event.button==3:
+            for y in range(48):
+                for x in range(64):
+                    self.screen.update_path(x,y)
+            screenmap.repaint()
+
+    def on_btn_edit_paths_clicked(self, button):
+        filepath=self.screen.map_file
+        if (filepath):
+            drawing_area = gtk.DrawingArea()
+            map_screen = MapScreen(filepath,self.screen)
+            map_screen.show()
+            map_screen.connect("button_press_event", self.on_map_screen_clicked)
+            map_screen.set_events(gtk.gdk.BUTTON_PRESS_MASK)
+            win_map = self.builder.get_object('win_map')
+
+            win_map.add(map_screen)
+            win_map.set_size_request(1024, 768)
+            win_map.set_visible(True)
+
+
+    ##############
+    #  Utils
+    ##############
+
+
     def showMessage(self, text):
         self.builder.get_object('lblMessage').set_text(text)
         self.builder.get_object('dlgMessage').set_visible(True)
@@ -302,11 +366,13 @@ class  RPYG_Designer:
             return pixbuf
 
 
+
     def open_file(self, pattern):
         dialog = gtk.FileChooserDialog(title="RPyG: Open File",action=gtk.FILE_CHOOSER_ACTION_OPEN, buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
         filter = gtk.FileFilter()
         filter.set_name(pattern)
-        filter.add_pattern(pattern)
+        for p in pattern.split():
+            filter.add_pattern(p)
         dialog.add_filter(filter)
         response = dialog.run()
         file_name = None

@@ -9,7 +9,7 @@ class ScreenExit:
         self.pos=pos
         self.keep_items_tokens=keep_items_tokens
         self.spawn_pos=spawn_pos
-        
+
 
 class Screen:
     def __init__(self, screen_name, game):
@@ -73,7 +73,7 @@ class Screen:
                         ]
 
 
-    
+
 
     def add_npc(self,name):
         npc=NPC(self,name)
@@ -95,11 +95,11 @@ class Screen:
             self.valid_path[y][x]=1
         else:
             self.valid_path[y][x]=0
-            
+
     def add_exit(self, name, destiny, pos, keep_items_tokens=True, spawn_pos=None):
         se=ScreenExit(name,destiny,pos,keep_items_tokens,spawn_pos)
         self.exits.append(se)
-        
+
     def remove_exit(self,name):
         for e in self.exits:
             if e.name==name:
@@ -113,11 +113,12 @@ class Game:
         self.screens=[]
         self.tokens=[]
         self.items=[]
-        
+
 
     def add_screen(self, screen_name):
         screen=Screen(screen_name,self)
         self.screens.append(screen)
+        return screen
 
     def remove_screen(self,name):
         screen=self.get_screen(name)
@@ -150,6 +151,6 @@ class Game:
             if it.name==name:
                 return it
         return None
-    
+
 
 
