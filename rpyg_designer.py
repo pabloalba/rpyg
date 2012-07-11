@@ -148,6 +148,8 @@ class  RPYG_Designer:
         self.builder.get_object('btn_npc_map').set_image(image)
         image = gtk.image_new_from_pixbuf(icon)
         self.builder.get_object('btn_exit_map').set_image(image)
+        image = gtk.image_new_from_pixbuf(icon)
+        self.builder.get_object('btn_destiny_map').set_image(image)
 
         icon  = self.load_image(os.path.join('images','dialogs.png'), 90)
         image = gtk.image_new_from_pixbuf(icon)
@@ -173,7 +175,7 @@ class  RPYG_Designer:
 
 
         # set liststore
-        if (self.liststore_npcs):
+        if (self.liststore_maps):
             liststore = self.liststore_maps
             liststore.clear()
         else:
@@ -280,7 +282,7 @@ class  RPYG_Designer:
                 self.open_npc_dialog(None)
             else:
                 self.npc = self.screen.npcs[pos-1]
-                self.load_npc_properties(self.screen.npcs[pos-1])
+                self.load_npc_properties(self.npc)
 
     def on_icon_exit_clicked(self, iconview):
         selected = iconview.get_selected_items()
@@ -298,10 +300,16 @@ class  RPYG_Designer:
                 self.builder.get_object('iconview_exits').select_path((pos,))
                 self.load_exit_properties(self.s_exit)
 
-
-
+                self.builder.get_object('exit_area').set_sensitive(True)
             else:
-                pass
+                self.s_exit = self.screen.exits[pos-1]
+                self.load_exit_properties(self.s_exit)
+
+
+    def on_exit_keep_toggled(self, button):
+        self.s_exit.keep_items_tokens = button.get_active()
+
+
 
     def load_screen(self, pos):
         self.screen = self.game.screens[pos]
@@ -372,27 +380,34 @@ class  RPYG_Designer:
 
     def load_exits(self):
         self.init_iconview_exits()
+        self.builder.get_object('exit_area').set_sensitive(False)
+        if (len(self.screen.exits) == 0 ):
+            self.builder.get_object('exit_name').set_text('')
+            self.builder.get_object('exit_x').set_text('')
+            self.builder.get_object('exit_y').set_text('')
+
+        else:
+            #Load exits
+            i = 0
+            for e in self.screen.exits:
+                pixbuf = self.load_image(os.path.join("images","exit.png"), 32, 32)
+                self.liststore_exits.append([pixbuf, e.name])
 
 
     def load_npcs(self):
+        self.builder.get_object('npc_area').set_sensitive(False)
         self.init_iconview_npcs()
         if (len(self.screen.npcs) == 0 ):
             self.builder.get_object('npc_name').set_text('')
             self.builder.get_object('npc_x').set_text('')
             self.builder.get_object('npc_y').set_text('')
-            self.builder.get_object('npc_area').set_sensitive(False)
         else:
-            self.builder.get_object('npc_area').set_sensitive(True)
             #Load npcs
             i = 0
             for npc in self.screen.npcs:
                 self.add_npc_icon(npc)
 
-            #Load and select npc
-            pos = len(self.screen.npcs)
-            self.npc = self.screen.npcs[pos-1]
-            self.load_npc_properties(self.npc)
-            self.builder.get_object('iconview_npcs').select_path((pos,))
+
 
 
     def add_npc_icon(self, npc):
@@ -403,6 +418,7 @@ class  RPYG_Designer:
         self.win_rpyg.show_all()
 
     def load_npc_properties(self, npc):
+        self.builder.get_object('npc_area').set_sensitive(True)
         #Write npc properties
         self.builder.get_object('npc_name').set_text(npc.name)
         self.builder.get_object('npc_x').set_text(str(npc.pos[0]))
@@ -410,10 +426,12 @@ class  RPYG_Designer:
         self.actor_load_image_dialog(self.builder.get_object('btn_npc_image_dialogs'), self.npc.img_dialog)
 
     def load_exit_properties(self, s_exit):
+        self.builder.get_object('exit_area').set_sensitive(True)
         #Write exit properties
         self.builder.get_object('exit_name').set_text(s_exit.name)
         self.builder.get_object('exit_x').set_text(str(s_exit.pos[0]))
         self.builder.get_object('exit_y').set_text(str(s_exit.pos[1]))
+        self.builder.get_object('exit_keep').set_active(s_exit.keep_items_tokens)
 
 
     def load_prot(self):
@@ -499,6 +517,48 @@ class  RPYG_Designer:
         field_x = self.builder.get_object('exit_x')
         field_y = self.builder.get_object('exit_y')
         self.on_map_clicked(screenmap,event, self.s_exit, field_x, field_y)
+
+    def update_exit_coordinates(self, a, b):
+        try:
+            x = int(self.builder.get_object('exit_x').get_text())
+            y = int(self.builder.get_object('exit_y').get_text())
+            pos = [x, y]
+            self.s_exit.pos = pos
+        except:
+            pass
+
+
+    def btn_destiny_map_clicked(self, button):
+        iconview = self.builder.get_object('iconview_destiny')
+        #liststore
+        liststore = iconview.get_model()
+        if (not liststore):
+            # set basic properties
+
+            iconview.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+            iconview.set_item_orientation(gtk.ORIENTATION_VERTICAL)
+
+            # set columns
+            iconview.set_text_column(1)
+            iconview.set_pixbuf_column(0)
+
+            liststore = gtk.ListStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING)
+        else:
+            liststore.clear()
+
+        ignore = True #Ignore the first element
+        for o in self.liststore_maps:
+            if (ignore):
+                ignore = False
+            else:
+                liststore.append(o)
+
+        iconview.set_model(liststore)
+
+        self.builder.get_object('win_screens').set_visible(True)
+
+    def on_btn_destiny_cancel_clicked(self, button):
+        self.builder.get_object('win_screens').set_visible(False)
 
 
     #actors
@@ -672,22 +732,33 @@ class  RPYG_Designer:
 
 
     def screen_name_change(self, field, event):
-        self.screen.name = field.get_text()
-        selected = self.builder.get_object('iconview_maps').get_selected_items()
-        if (len(selected) == 1):
-            pos = selected[0][0]
-            self.liststore_maps[pos][1]=self.screen.name
+        if (field.get_text()):
+            self.screen.name = field.get_text()
+            selected = self.builder.get_object('iconview_maps').get_selected_items()
+            if (len(selected) == 1):
+                pos = selected[0][0]
+                self.liststore_maps[pos][1]=self.screen.name
 
 
     def prot_name_change(self, field, event):
-        self.screen.protagonist.name = field.get_text()
+        if (field.get_text()):
+            self.screen.protagonist.name = field.get_text()
 
     def npc_name_change(self, field, event):
-        self.npc.name = field.get_text()
-        selected = self.builder.get_object('iconview_npcs').get_selected_items()
-        if (len(selected) == 1):
-            pos = selected[0][0]
-            self.liststore_npcs[pos][1]=self.npc.name
+        if (field.get_text()):
+            self.npc.name = field.get_text()
+            selected = self.builder.get_object('iconview_npcs').get_selected_items()
+            if (len(selected) == 1):
+                pos = selected[0][0]
+                self.liststore_npcs[pos][1]=self.npc.name
+
+    def exit_name_change(self, field, event):
+        if (field.get_text()):
+            self.s_exit.name = field.get_text()
+            selected = self.builder.get_object('iconview_exits').get_selected_items()
+            if (len(selected) == 1):
+                pos = selected[0][0]
+                self.liststore_exits[pos][1]=self.s_exit.name
 
     def screen_music_select(self, button):
         filename = self.open_file ("*.ogg *.mp3")

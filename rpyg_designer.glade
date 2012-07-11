@@ -594,7 +594,7 @@ Right button inverts selection.</property>
                                                 <property name="label" translatable="yes">Y:</property>
                                               </object>
                                               <packing>
-                                                <property name="x">220</property>
+                                                <property name="x">210</property>
                                                 <property name="y">94</property>
                                               </packing>
                                             </child>
@@ -622,7 +622,7 @@ Right button inverts selection.</property>
                                                 <signal name="focus-out-event" handler="update_prot_coordinates" swapped="no"/>
                                               </object>
                                               <packing>
-                                                <property name="x">240</property>
+                                                <property name="x">230</property>
                                                 <property name="y">94</property>
                                               </packing>
                                             </child>
@@ -936,7 +936,7 @@ Right button inverts selection.</property>
                                             <child>
                                               <object class="GtkFixed" id="exit_area">
                                                 <property name="width_request">587</property>
-                                                <property name="height_request">150</property>
+                                                <property name="height_request">133</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">False</property>
                                                 <child>
@@ -961,6 +961,7 @@ Right button inverts selection.</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="invisible_char">•</property>
                                                     <property name="invisible_char_set">True</property>
+                                                    <signal name="focus-out-event" handler="exit_name_change" swapped="no"/>
                                                   </object>
                                                   <packing>
                                                     <property name="x">25</property>
@@ -1020,7 +1021,7 @@ Right button inverts selection.</property>
                                                     <property name="label" translatable="yes">Y:</property>
                                                   </object>
                                                   <packing>
-                                                    <property name="x">220</property>
+                                                    <property name="x">210</property>
                                                     <property name="y">94</property>
                                                   </packing>
                                                 </child>
@@ -1032,6 +1033,7 @@ Right button inverts selection.</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="invisible_char">•</property>
                                                     <property name="invisible_char_set">True</property>
+                                                    <signal name="focus-out-event" handler="update_exit_coordinates" swapped="no"/>
                                                   </object>
                                                   <packing>
                                                     <property name="x">170</property>
@@ -1046,10 +1048,184 @@ Right button inverts selection.</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="invisible_char">•</property>
                                                     <property name="invisible_char_set">True</property>
+                                                    <signal name="focus-out-event" handler="update_exit_coordinates" swapped="no"/>
                                                   </object>
                                                   <packing>
-                                                    <property name="x">240</property>
+                                                    <property name="x">230</property>
                                                     <property name="y">94</property>
+                                                  </packing>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkFrame" id="frame1">
+                                                    <property name="width_request">260</property>
+                                                    <property name="height_request">112</property>
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">False</property>
+                                                    <property name="label_xalign">0</property>
+                                                    <property name="shadow_type">etched-out</property>
+                                                    <child>
+                                                      <object class="GtkAlignment" id="alignment2">
+                                                        <property name="visible">True</property>
+                                                        <property name="can_focus">False</property>
+                                                        <property name="top_padding">4</property>
+                                                        <property name="left_padding">12</property>
+                                                        <child>
+                                                          <object class="GtkFixed" id="fixed9">
+                                                            <property name="visible">True</property>
+                                                            <property name="can_focus">False</property>
+                                                            <child>
+                                                            <object class="GtkLabel" id="label21">
+                                                            <property name="height_request">20</property>
+                                                            <property name="visible">True</property>
+                                                            <property name="can_focus">False</property>
+                                                            <property name="xalign">0</property>
+                                                            <property name="label" translatable="yes">Screen: </property>
+                                                            </object>
+                                                            </child>
+                                                            <child>
+                                                            <object class="GtkEntry" id="destiny_name">
+                                                            <property name="width_request">170</property>
+                                                            <property name="height_request">20</property>
+                                                            <property name="visible">True</property>
+                                                            <property name="sensitive">False</property>
+                                                            <property name="can_focus">True</property>
+                                                            <property name="invisible_char">•</property>
+                                                            </object>
+                                                            <packing>
+                                                            <property name="x">65</property>
+                                                            </packing>
+                                                            </child>
+                                                            <child>
+                                                            <object class="GtkLabel" id="label22">
+                                                            <property name="height_request">20</property>
+                                                            <property name="visible">True</property>
+                                                            <property name="can_focus">False</property>
+                                                            <property name="xalign">0</property>
+                                                            <property name="label" translatable="yes">Coordinates</property>
+                                                            </object>
+                                                            <packing>
+                                                            <property name="y">34</property>
+                                                            </packing>
+                                                            </child>
+                                                            <child>
+                                                            <object class="GtkButton" id="btn_destiny_map">
+                                                            <property name="label" translatable="yes">Select in map</property>
+                                                            <property name="use_action_appearance">False</property>
+                                                            <property name="height_request">32</property>
+                                                            <property name="visible">True</property>
+                                                            <property name="can_focus">True</property>
+                                                            <property name="receives_default">True</property>
+                                                            <property name="use_action_appearance">False</property>
+                                                            <signal name="clicked" handler="btn_destiny_map_clicked" swapped="no"/>
+                                                            </object>
+                                                            <packing>
+                                                            <property name="y">59</property>
+                                                            </packing>
+                                                            </child>
+                                                            <child>
+                                                            <object class="GtkLabel" id="label23">
+                                                            <property name="width_request">20</property>
+                                                            <property name="height_request">20</property>
+                                                            <property name="visible">True</property>
+                                                            <property name="can_focus">False</property>
+                                                            <property name="label" translatable="yes">X:</property>
+                                                            </object>
+                                                            <packing>
+                                                            <property name="x">125</property>
+                                                            <property name="y">68</property>
+                                                            </packing>
+                                                            </child>
+                                                            <child>
+                                                            <object class="GtkLabel" id="label24">
+                                                            <property name="width_request">20</property>
+                                                            <property name="height_request">20</property>
+                                                            <property name="visible">True</property>
+                                                            <property name="can_focus">False</property>
+                                                            <property name="label" translatable="yes">Y:</property>
+                                                            </object>
+                                                            <packing>
+                                                            <property name="x">185</property>
+                                                            <property name="y">68</property>
+                                                            </packing>
+                                                            </child>
+                                                            <child>
+                                                            <object class="GtkEntry" id="destiny_x">
+                                                            <property name="width_request">30</property>
+                                                            <property name="height_request">20</property>
+                                                            <property name="visible">True</property>
+                                                            <property name="can_focus">True</property>
+                                                            <property name="invisible_char">•</property>
+                                                            </object>
+                                                            <packing>
+                                                            <property name="x">145</property>
+                                                            <property name="y">68</property>
+                                                            </packing>
+                                                            </child>
+                                                            <child>
+                                                            <object class="GtkEntry" id="destiny_y">
+                                                            <property name="width_request">30</property>
+                                                            <property name="height_request">20</property>
+                                                            <property name="visible">True</property>
+                                                            <property name="can_focus">True</property>
+                                                            <property name="invisible_char">•</property>
+                                                            </object>
+                                                            <packing>
+                                                            <property name="x">205</property>
+                                                            <property name="y">68</property>
+                                                            </packing>
+                                                            </child>
+                                                          </object>
+                                                        </child>
+                                                      </object>
+                                                    </child>
+                                                    <child type="label">
+                                                      <object class="GtkLabel" id="label17">
+                                                        <property name="visible">True</property>
+                                                        <property name="can_focus">False</property>
+                                                        <property name="label" translatable="yes">  Destiny  </property>
+                                                        <property name="use_markup">True</property>
+                                                        <attributes>
+                                                          <attribute name="background" value="#d3d3d3d3d3d3"/>
+                                                        </attributes>
+                                                      </object>
+                                                    </child>
+                                                  </object>
+                                                  <packing>
+                                                    <property name="x">304</property>
+                                                    <property name="y">5</property>
+                                                  </packing>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkCheckButton" id="exit_keep">
+                                                    <property name="label" translatable="yes">Keep inventory</property>
+                                                    <property name="use_action_appearance">False</property>
+                                                    <property name="height_request">20</property>
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">True</property>
+                                                    <property name="receives_default">False</property>
+                                                    <property name="use_action_appearance">False</property>
+                                                    <property name="xalign">0</property>
+                                                    <property name="draw_indicator">True</property>
+                                                    <signal name="toggled" handler="on_exit_keep_toggled" swapped="no"/>
+                                                  </object>
+                                                  <packing>
+                                                    <property name="x">25</property>
+                                                    <property name="y">127</property>
+                                                  </packing>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkImage" id="image1">
+                                                    <property name="width_request">32</property>
+                                                    <property name="height_request">32</property>
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">False</property>
+                                                    <property name="tooltip_text" translatable="yes">The protagonist will keep the objects 
+on the inventory, and the tokens</property>
+                                                    <property name="stock">gtk-dialog-question</property>
+                                                  </object>
+                                                  <packing>
+                                                    <property name="x">157</property>
+                                                    <property name="y">119</property>
                                                   </packing>
                                                 </child>
                                               </object>
@@ -1142,6 +1318,79 @@ Right button inverts selection.</property>
           </object>
           <packing>
             <property name="y">29</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkWindow" id="win_screens">
+    <property name="width_request">800</property>
+    <property name="height_request">600</property>
+    <property name="can_focus">False</property>
+    <property name="title" translatable="yes">RPyG Designer: Select destiny screen</property>
+    <property name="resizable">False</property>
+    <property name="modal">True</property>
+    <property name="window_position">center-always</property>
+    <property name="destroy_with_parent">True</property>
+    <property name="deletable">False</property>
+    <child>
+      <object class="GtkFixed" id="fixed10">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <child>
+          <object class="GtkScrolledWindow" id="scrolledwindow3">
+            <property name="width_request">800</property>
+            <property name="height_request">550</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="shadow_type">in</property>
+            <child>
+              <object class="GtkViewport" id="viewport5">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <child>
+                  <object class="GtkIconView" id="iconview_destiny">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton" id="btn_destiny_ok">
+            <property name="label">gtk-ok</property>
+            <property name="use_action_appearance">False</property>
+            <property name="width_request">100</property>
+            <property name="height_request">30</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="use_action_appearance">False</property>
+            <property name="use_stock">True</property>
+          </object>
+          <packing>
+            <property name="x">450</property>
+            <property name="y">560</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="btn_destiny_cancel">
+            <property name="label">gtk-cancel</property>
+            <property name="use_action_appearance">False</property>
+            <property name="width_request">100</property>
+            <property name="height_request">30</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="use_action_appearance">False</property>
+            <property name="use_stock">True</property>
+            <signal name="clicked" handler="on_btn_destiny_cancel_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="x">250</property>
+            <property name="y">560</property>
           </packing>
         </child>
       </object>
