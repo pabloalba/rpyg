@@ -13,7 +13,7 @@ import os
 # Classes
 # ---------------------------------------------------------------------
 class Actor:
-    def __init__(self,screen,name,pos=[0,0],img_file=None,img_dialog=None,max_rows=0,max_cols=0):
+    def __init__(self,screen,name,pos=[0,0],img_file=None,img_dialog=None,max_rows=4,max_cols=4):
         self.name=name
         self.pos=pos
         if (not img_file):

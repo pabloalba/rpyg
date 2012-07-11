@@ -23,14 +23,21 @@ class RPYG:
         self.display_copy=None
         pygame.display.set_caption('RPyG')
         pygame.font.init()
-        self.load_game(game_file)
+
+        #self.load_game(game_file)
+        game = open_game(game_file)
+        if (game):
+            self.game = game[0]
 
 
-        for item in self.game.items:
-            item.init_display()
-        self.clock = pygame.time.Clock()
-        self.dialog=None
-        self.load_screen(self.game)
+            for item in self.game.items:
+                item.init_display()
+            self.clock = pygame.time.Clock()
+            self.dialog=None
+            self.load_screen(self.game)
+        else:
+            print "Error loading game"
+            exit()
 
     def load_screen(self,game,name=''):
         inventory=None

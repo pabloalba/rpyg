@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
- 
+
 # Modules
 import sys, pygame, os
 from pygame.locals import *
@@ -31,9 +31,9 @@ FRAMERATE = 30 # how often to check if playback has finished
 
 # Classes
 # ---------------------------------------------------------------------
- 
+
 # ---------------------------------------------------------------------
- 
+
 # Functions
 # ---------------------------------------------------------------------
 def load_image(filename, transparent=False):
@@ -45,13 +45,13 @@ def load_image(filename, transparent=False):
                 color = image.get_at((0,0))
                 image.set_colorkey(color, RLEACCEL)
         return image
-        
-        
+
+
 
 
 def play_sound(soundfile):
     """Play sound through default mixer channel in blocking manner.
-    
+
     This will load the whole sound into memory before playback
     """
 
@@ -66,11 +66,11 @@ def playmusic2(soundfile):
     """Stream music with mixer.music module using the event module to wait
        until the playback has finished.
 
-    This method doesn't use a busy/poll loop, but has the disadvantage that 
+    This method doesn't use a busy/poll loop, but has the disadvantage that
     you neet to initialize the video module to use the event module.
-    
+
     Also, interrupting the playback with Ctrl-C does not work :-(
-    
+
     Change the call to 'playmusic' in the 'main' function to 'playmusic2'
     to use this method.
     """
@@ -93,7 +93,7 @@ def draw_text(screen,text, posx, posy, color=(255, 255, 255), size=24):
     result_rect.top = posy
     screen.blit(result, result_rect)
 
-    
+
 # Corta un chara en las fil y col indicadas. Array Bidimensional.
 def cut_chara(ruta, fil, col):
     image = load_image(ruta, True)
@@ -103,19 +103,19 @@ def cut_chara(ruta, fil, col):
     sprite = range(fil)
     for i in range(fil):
         sprite[i] = range(col)
- 
+
     for f in range(fil):
         for c in range(col):
             sprite[f][c] = image.subsurface((rect.left, rect.top, w, h))
             rect.left += w
         rect.top += h
         rect.left = 0
- 
-    return sprite    
- 
+
+    return sprite
+
 # ---------------------------------------------------------------------
- 
- 
+
+
 def get_selected_value(treeview):
     value=None
     # Get the selection in the gtk.TreeView
@@ -127,7 +127,7 @@ def get_selected_value(treeview):
         """There is a selection, so now get the the value"""
         value = treeview.get_model().get_value(selection_iter, 0)
     return value
-    
+
 def get_list_values(treelist):
     iter = treelist.get_iter_root()
     values=[]

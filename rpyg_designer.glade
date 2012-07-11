@@ -1,42 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
-  <object class="GtkDialog" id="dlgMessage">
-    <property name="can_focus">False</property>
-    <property name="border_width">5</property>
-    <property name="title" translatable="yes">RPyG</property>
-    <property name="modal">True</property>
-    <property name="type_hint">dialog</property>
-    <child internal-child="vbox">
-      <object class="GtkBox" id="dialog-vbox1">
-        <property name="can_focus">False</property>
-        <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox" id="dialog-action_area1">
-            <property name="can_focus">False</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="pack_type">end</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkLabel" id="lblMessage">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
-        </child>
-      </object>
-    </child>
-  </object>
   <object class="GtkWindow" id="win_map">
     <property name="can_focus">False</property>
     <property name="resizable">False</property>
@@ -305,7 +269,7 @@
                               </object>
                               <packing>
                                 <property name="x">10</property>
-                                <property name="y">35</property>
+                                <property name="y">25</property>
                               </packing>
                             </child>
                             <child>
@@ -319,21 +283,21 @@
                               </object>
                               <packing>
                                 <property name="x">10</property>
-                                <property name="y">80</property>
+                                <property name="y">85</property>
                               </packing>
                             </child>
                             <child>
                               <object class="GtkEntry" id="txt_screen_music">
-                                <property name="width_request">210</property>
-                                <property name="height_request">20</property>
+                                <property name="width_request">298</property>
+                                <property name="height_request">23</property>
                                 <property name="visible">True</property>
                                 <property name="sensitive">False</property>
                                 <property name="can_focus">True</property>
                                 <property name="invisible_char">•</property>
                               </object>
                               <packing>
-                                <property name="x">100</property>
-                                <property name="y">80</property>
+                                <property name="x">10</property>
+                                <property name="y">105</property>
                               </packing>
                             </child>
                             <child>
@@ -349,22 +313,22 @@
                                 <signal name="clicked" handler="screen_music_select" swapped="no"/>
                               </object>
                               <packing>
-                                <property name="x">322</property>
-                                <property name="y">80</property>
+                                <property name="x">317</property>
+                                <property name="y">105</property>
                               </packing>
                             </child>
                             <child>
                               <object class="GtkEntry" id="txt_screen_name">
-                                <property name="width_request">250</property>
-                                <property name="height_request">20</property>
+                                <property name="width_request">336</property>
+                                <property name="height_request">23</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="invisible_char">•</property>
                                 <signal name="focus-out-event" handler="screen_name_change" swapped="no"/>
                               </object>
                               <packing>
-                                <property name="x">100</property>
-                                <property name="y">35</property>
+                                <property name="x">10</property>
+                                <property name="y">50</property>
                               </packing>
                             </child>
                             <child>
@@ -380,12 +344,12 @@
                                 <signal name="clicked" handler="on_btn_edit_paths_clicked" swapped="no"/>
                               </object>
                               <packing>
-                                <property name="x">58</property>
-                                <property name="y">134</property>
+                                <property name="x">66</property>
+                                <property name="y">151</property>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkImage" id="image2">
+                              <object class="GtkImage" id="help_1">
                                 <property name="width_request">32</property>
                                 <property name="height_request">32</property>
                                 <property name="visible">True</property>
@@ -393,11 +357,10 @@
                                 <property name="tooltip_text" translatable="yes">Mark on blue the positions where
 the protagonist can walk.
 Right button inverts selection.</property>
-                                <property name="stock">gtk-dialog-question</property>
                               </object>
                               <packing>
                                 <property name="x">282</property>
-                                <property name="y">133</property>
+                                <property name="y">150</property>
                               </packing>
                             </child>
                           </object>
@@ -495,7 +458,7 @@ Right button inverts selection.</property>
                                                 <property name="label" translatable="yes">Image for dialogs</property>
                                               </object>
                                               <packing>
-                                                <property name="x">307</property>
+                                                <property name="x">440</property>
                                               </packing>
                                             </child>
                                             <child>
@@ -506,7 +469,7 @@ Right button inverts selection.</property>
                                                 <property name="label" translatable="yes">Character</property>
                                               </object>
                                               <packing>
-                                                <property name="x">477</property>
+                                                <property name="x">330</property>
                                               </packing>
                                             </child>
                                             <child>
@@ -521,7 +484,7 @@ Right button inverts selection.</property>
                                                 <signal name="clicked" handler="btn_prot_image_dialogs_clicked" swapped="no"/>
                                               </object>
                                               <packing>
-                                                <property name="x">320</property>
+                                                <property name="x">451</property>
                                                 <property name="y">20</property>
                                               </packing>
                                             </child>
@@ -537,7 +500,7 @@ Right button inverts selection.</property>
                                                 <signal name="clicked" handler="btn_prot_image_chara_clicked" swapped="no"/>
                                               </object>
                                               <packing>
-                                                <property name="x">461</property>
+                                                <property name="x">314</property>
                                                 <property name="y">20</property>
                                               </packing>
                                             </child>
@@ -633,12 +596,13 @@ Right button inverts selection.</property>
                                     <child type="label">
                                       <object class="GtkLabel" id="label_prot">
                                         <property name="width_request">573</property>
+                                        <property name="height_request">22</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
                                         <property name="margin_top">4</property>
                                         <property name="margin_bottom">4</property>
                                         <property name="xalign">0</property>
-                                        <property name="label" translatable="yes">PROTAGONIST</property>
+                                        <property name="label" translatable="yes"> PROTAGONIST</property>
                                       </object>
                                     </child>
                                   </object>
@@ -654,6 +618,7 @@ Right button inverts selection.</property>
                               <object class="GtkEventBox" id="box_npcs_title">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
+                                <property name="margin_top">2</property>
                                 <property name="border_width">1</property>
                                 <child>
                                   <object class="GtkExpander" id="expander2">
@@ -728,13 +693,14 @@ Right button inverts selection.</property>
                                                 </child>
                                                 <child>
                                                   <object class="GtkLabel" id="label11">
+                                                    <property name="width_request">118</property>
                                                     <property name="height_request">20</property>
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">False</property>
                                                     <property name="label" translatable="yes">Image for dialogs</property>
                                                   </object>
                                                   <packing>
-                                                    <property name="x">307</property>
+                                                    <property name="x">440</property>
                                                   </packing>
                                                 </child>
                                                 <child>
@@ -749,7 +715,7 @@ Right button inverts selection.</property>
                                                     <signal name="clicked" handler="btn_npc_image_dialogs_clicked" swapped="no"/>
                                                   </object>
                                                   <packing>
-                                                    <property name="x">320</property>
+                                                    <property name="x">451</property>
                                                     <property name="y">20</property>
                                                   </packing>
                                                 </child>
@@ -851,7 +817,7 @@ Right button inverts selection.</property>
                                                     <property name="use_action_appearance">False</property>
                                                   </object>
                                                   <packing>
-                                                    <property name="x">461</property>
+                                                    <property name="x">314</property>
                                                     <property name="y">20</property>
                                                   </packing>
                                                 </child>
@@ -864,7 +830,7 @@ Right button inverts selection.</property>
                                                     <property name="label" translatable="yes">Dialogs</property>
                                                   </object>
                                                   <packing>
-                                                    <property name="x">477</property>
+                                                    <property name="x">333</property>
                                                   </packing>
                                                 </child>
                                               </object>
@@ -878,9 +844,10 @@ Right button inverts selection.</property>
                                     </child>
                                     <child type="label">
                                       <object class="GtkLabel" id="label_npcs">
+                                        <property name="height_request">22</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="label" translatable="yes">NPCs</property>
+                                        <property name="label" translatable="yes"> NPCs</property>
                                       </object>
                                     </child>
                                   </object>
@@ -1155,6 +1122,7 @@ Right button inverts selection.</property>
                                                             <property name="visible">True</property>
                                                             <property name="can_focus">True</property>
                                                             <property name="invisible_char">•</property>
+                                                            <signal name="focus-out-event" handler="update_destiny_coordinates" swapped="no"/>
                                                             </object>
                                                             <packing>
                                                             <property name="x">145</property>
@@ -1168,6 +1136,7 @@ Right button inverts selection.</property>
                                                             <property name="visible">True</property>
                                                             <property name="can_focus">True</property>
                                                             <property name="invisible_char">•</property>
+                                                            <signal name="focus-out-event" handler="update_destiny_coordinates" swapped="no"/>
                                                             </object>
                                                             <packing>
                                                             <property name="x">205</property>
@@ -1214,14 +1183,13 @@ Right button inverts selection.</property>
                                                   </packing>
                                                 </child>
                                                 <child>
-                                                  <object class="GtkImage" id="image1">
+                                                  <object class="GtkImage" id="help_2">
                                                     <property name="width_request">32</property>
                                                     <property name="height_request">32</property>
                                                     <property name="visible">True</property>
                                                     <property name="can_focus">False</property>
                                                     <property name="tooltip_text" translatable="yes">The protagonist will keep the objects 
 on the inventory, and the tokens</property>
-                                                    <property name="stock">gtk-dialog-question</property>
                                                   </object>
                                                   <packing>
                                                     <property name="x">157</property>
@@ -1239,9 +1207,10 @@ on the inventory, and the tokens</property>
                                     </child>
                                     <child type="label">
                                       <object class="GtkLabel" id="label_exits">
+                                        <property name="height_request">22</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">False</property>
-                                        <property name="label" translatable="yes">EXITS</property>
+                                        <property name="label" translatable="yes"> EXITS</property>
                                       </object>
                                     </child>
                                   </object>
@@ -1369,6 +1338,7 @@ on the inventory, and the tokens</property>
             <property name="receives_default">True</property>
             <property name="use_action_appearance">False</property>
             <property name="use_stock">True</property>
+            <signal name="clicked" handler="on_btn_destiny_ok_clicked" swapped="no"/>
           </object>
           <packing>
             <property name="x">450</property>

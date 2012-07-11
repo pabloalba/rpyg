@@ -11,8 +11,9 @@ import gobject, cairo
 import zipfile
 import tempfile
 
+import shutil
 
-
+import rpyg_utils
 
 def load_image(filepath):
         img=Image()
@@ -72,19 +73,21 @@ class MapScreen(gtk.DrawingArea):
 
 
 
-        #Marked Path
-        cr.set_source_rgba(0, 0, 1, 0.5)
-        for x in range(64):
-            for y in range(48):
-                if self.screen.valid_path[y][x]==1:
-                    cr.rectangle(x*16, y*16, 16, 16)
-                    cr.fill()
+
 
         #mark
         if (self.mark_x > -1) and (self.mark_y > -1):
             cr.set_source_rgba(1, 1, 0, 0.5)
             cr.rectangle(self.mark_x*32, self.mark_y*32, 32, 32)
             cr.fill()
+        else:
+            #Marked Path
+            cr.set_source_rgba(0, 0, 1, 0.5)
+            for x in range(64):
+                for y in range(48):
+                    if self.screen.valid_path[y][x]==1:
+                        cr.rectangle(x*16, y*16, 16, 16)
+                        cr.fill()
 
 
 
@@ -120,15 +123,13 @@ class  RPYG_Designer:
 
         self.builder.get_object('box_prot_title').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color('#606060'))
         self.builder.get_object('label_prot').modify_fg(gtk.STATE_NORMAL, gtk.gdk.Color('#ffffff'))
-        self.builder.get_object('box_prot').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color("#A0A0A0"))
+        self.builder.get_object('box_prot').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color("#D3D3D3"))
 
         self.builder.get_object('box_npcs_title').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color('#606060'))
         self.builder.get_object('label_npcs').modify_fg(gtk.STATE_NORMAL, gtk.gdk.Color('#ffffff'))
-        self.builder.get_object('box_npcs').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color("#A0A0A0"))
 
         self.builder.get_object('box_exits_title').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color('#606060'))
         self.builder.get_object('label_exits').modify_fg(gtk.STATE_NORMAL, gtk.gdk.Color('#ffffff'))
-        self.builder.get_object('box_exits').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color("#A0A0A0"))
 
 
 
@@ -154,6 +155,10 @@ class  RPYG_Designer:
         icon  = self.load_image(os.path.join('images','dialogs.png'), 90)
         image = gtk.image_new_from_pixbuf(icon)
         self.builder.get_object('btn_npc_dialogs').set_image(image)
+
+        icon  = self.load_image(os.path.join('images','help.png'), 25)
+        self.builder.get_object('help_1').set_from_pixbuf(icon)
+        self.builder.get_object('help_2').set_from_pixbuf(icon)
 
 
         self.liststore_maps = None
@@ -385,6 +390,9 @@ class  RPYG_Designer:
             self.builder.get_object('exit_name').set_text('')
             self.builder.get_object('exit_x').set_text('')
             self.builder.get_object('exit_y').set_text('')
+            self.builder.get_object('destiny_name').set_text('')
+            self.builder.get_object('destiny_x').set_text('')
+            self.builder.get_object('destiny_y').set_text('')
 
         else:
             #Load exits
@@ -432,6 +440,12 @@ class  RPYG_Designer:
         self.builder.get_object('exit_x').set_text(str(s_exit.pos[0]))
         self.builder.get_object('exit_y').set_text(str(s_exit.pos[1]))
         self.builder.get_object('exit_keep').set_active(s_exit.keep_items_tokens)
+        if s_exit.screen:
+            self.builder.get_object('destiny_name').set_text(s_exit.screen.name)
+        else:
+            self.builder.get_object('destiny_name').set_text('')
+        self.builder.get_object('destiny_x').set_text(str(s_exit.spawn_pos[0]))
+        self.builder.get_object('destiny_y').set_text(str(s_exit.spawn_pos[1]))
 
 
     def load_prot(self):
@@ -447,7 +461,7 @@ class  RPYG_Designer:
 
 
     ###################################################
-    # Actors
+    # Actors and exits
     ###################################################
 
 
@@ -475,14 +489,14 @@ class  RPYG_Designer:
     def on_prot_map_clicked(self,screenmap,event):
         field_x = self.builder.get_object('prot_x')
         field_y = self.builder.get_object('prot_y')
-        self.on_map_clicked(screenmap,event, self.screen.protagonist, field_x, field_y)
+        self.screen.protagonist.pos = self.on_map_clicked(screenmap,event, field_x, field_y)
 
     def update_prot_coordinates(self, field):
         try:
             x = int(self.builder.get_object('prot_x').get_text())
             y = int(self.builder.get_object('prot_y').get_text())
-            pos = [x, y]
-            self.screen.protagonist.pos = pos
+            self.screen.protagonist.pos[0] = x
+            self.screen.protagonist.pos[1] = y
         except:
             pass
 
@@ -498,14 +512,14 @@ class  RPYG_Designer:
     def on_npc_map_clicked(self,screenmap,event):
         field_x = self.builder.get_object('npc_x')
         field_y = self.builder.get_object('npc_y')
-        self.on_map_clicked(screenmap, event, self.npc, field_x, field_y)
+        self.npc.pos = self.on_map_clicked(screenmap, event, field_x, field_y)
 
     def update_npc_coordinates(self, a, b):
         try:
             x = int(self.builder.get_object('npc_x').get_text())
             y = int(self.builder.get_object('npc_y').get_text())
-            pos = [x, y]
-            self.npc.pos = pos
+            self.npc.pos[0] = x
+            self.npc.pos[1] = y
         except:
             pass
 
@@ -516,16 +530,26 @@ class  RPYG_Designer:
     def on_exit_map_clicked(self,screenmap,event):
         field_x = self.builder.get_object('exit_x')
         field_y = self.builder.get_object('exit_y')
-        self.on_map_clicked(screenmap,event, self.s_exit, field_x, field_y)
+        self.s_exit.pos = self.on_map_clicked(screenmap,event, field_x, field_y)
 
     def update_exit_coordinates(self, a, b):
         try:
             x = int(self.builder.get_object('exit_x').get_text())
             y = int(self.builder.get_object('exit_y').get_text())
-            pos = [x, y]
-            self.s_exit.pos = pos
+            self.s_exit.pos[0] = x
+            self.s_exit.pos[1] = y
         except:
             pass
+
+    def update_destiny_coordinates(self, a, b):
+        try:
+            x = int(self.builder.get_object('destiny_x').get_text())
+            y = int(self.builder.get_object('destiny_y').get_text())
+            self.s_exit[0] = x
+            self.s_exit[1] = y
+        except:
+            pass
+
 
 
     def btn_destiny_map_clicked(self, button):
@@ -560,6 +584,19 @@ class  RPYG_Designer:
     def on_btn_destiny_cancel_clicked(self, button):
         self.builder.get_object('win_screens').set_visible(False)
 
+    def on_btn_destiny_ok_clicked(self, button):
+        iconview = self.builder.get_object('iconview_destiny')
+        selected = iconview.get_selected_items()
+        pos = selected[0][0]
+        self.s_exit.screen = self.game.screens[pos]
+        self.builder.get_object('destiny_name').set_text(self.s_exit.screen.name)
+        self.builder.get_object('win_screens').set_visible(False)
+        self.btn_map_clicked(button, self.on_destiny_map_clicked, self.s_exit.spawn_pos[0], self.s_exit.spawn_pos[1], self.s_exit.screen.map_file)
+
+    def on_destiny_map_clicked(self,screenmap,event):
+        field_x = self.builder.get_object('destiny_x')
+        field_y = self.builder.get_object('destiny_y')
+        self.s_exit.spawn_pos = self.on_map_clicked(screenmap, event, field_x, field_y)
 
     #actors
     def set_actor_chara(self, actor, filename):
@@ -586,8 +623,10 @@ class  RPYG_Designer:
         button.set_image(image)
 
 
-    def btn_map_clicked(self, button, callback, x, y):
-        filepath=self.screen.map_file
+    def btn_map_clicked(self, button, callback, x, y, map_file=None):
+        if not map_file:
+            map_file = self.screen.map_file
+        filepath=map_file
         if (filepath):
             drawing_area = gtk.DrawingArea()
             map_screen = MapScreen(filepath,self.screen)
@@ -606,7 +645,7 @@ class  RPYG_Designer:
             win_map.set_size_request(1024, 768)
             win_map.set_visible(True)
 
-    def on_map_clicked(self, screenmap, event, actor, field_x, field_y):
+    def on_map_clicked(self, screenmap, event, field_x, field_y):
         if event.button==1:
             x=int(math.floor(event.x/32))
             y=int(math.floor(event.y/32))
@@ -614,7 +653,7 @@ class  RPYG_Designer:
             field_y.set_text(str(y))
             self.builder.get_object('win_map').destroy()
             pos = [x, y]
-            actor.pos = pos
+            return pos
 
 
 
@@ -628,50 +667,54 @@ class  RPYG_Designer:
         exit()
 
 
-    def clear_current():
+    def clear_store(self, store):
+        ignore = True
+        for row in store:
+            if (ignore):
+                ignore = False
+            else:
+                store.remove(row.iter)
+
+    def clear_current(self):
+        if self.liststore_maps:
+            self.clear_store(self.liststore_maps)
+        if self.liststore_npcs:
+            self.clear_store(self.liststore_npcs)
+        if self.liststore_exits:
+            self.clear_store(self.liststore_exits)
+
         self.builder.get_object('screen_box').set_sensitive(False)
         self.builder.get_object('screen_properties').set_sensitive(False)
 
+
+
+
     def open_game(self,button):
-        clear_current()
+        self.clear_current()
         filename = self.open_file('*.rpyg')
         if (filename):
+            game = rpyg_utils.open_game(filename)
+            if (game):
+                self.game = game[0]
+                tempDir = game[1]
 
-            #Extract zip to temp dir
-            tempDir = tempfile.mkdtemp(prefix = 'RPyG')
-            zf = zipfile.ZipFile(filename)
+                self.game_filename=os.path.join(tempDir, "game")
+                self.game_dir=tempDir
 
-
-            # extract files to directory structure
-            for i, name in enumerate(zf.namelist()):
-                if not name.endswith('/'):
-                    outfile = open(os.path.join(tempDir, name), 'wb')
-                    outfile.write(zf.read(name))
-                    outfile.flush()
-                    outfile.close()
-
-
-
-            game_file = os.path.join(tempDir, "game")
-            fileObj = open(game_file,"r")
-            try:
-                self.game=pickle.load(fileObj)
-
-                #~ self.load_screens()
+                self.load_screens()
                 #~ self.load_tokens()
                 #~ self.load_items()
-                self.game_filename=game_file
-                self.game_dir=tempDir
+
                 self.win_rpyg.set_title("RPyG Designer: "+str(os.path.basename(filename)))
                 self.builder.get_object('main_area').set_sensitive(True)
-            except:
+            else:
                 self.builder.get_object('main_area').set_sensitive(False)
-                self.showMessage("Error on load file")
+                self.show_error("Error on load file")
 
-
-            fileObj.close()
-
-
+    def load_screens(self):
+        for screen in self.game.screens:
+            screen_icon  = self.load_image(screen.map_file, 144, 90)
+            self.liststore_maps.append([screen_icon, screen.name])
 
     def save_game_as(self,button):
         self.game_filename = self.save_file('*.rpyg')
@@ -691,20 +734,61 @@ class  RPYG_Designer:
 
         if (self.game_filename):
             #Create temp dir
-            if (self.game_dir):
-                tempDir = self.game_dir
-            else:
-                tempDir = tempfile.mkdtemp(prefix = 'RPyG')
-                self.game_dir = tempDir
-            gameFile = os.path.join(tempDir, "game")
-            fileObj = open(gameFile,"w")
-            pickle.dump(self.game,fileObj)
-            fileObj.close()
+            tempDir = tempfile.mkdtemp(prefix = 'RPyG')
+            self.game_dir = tempDir
+
 
             resourcesDir = os.path.join(tempDir, "resources")
             if (not os.path.exists(resourcesDir)):
                 os.makedirs(resourcesDir)
 
+            #Copy all files
+            num = 1
+            for screen in self.game.screens:
+                file_name = os.path.join(resourcesDir, 'img_'+str(num)+'.png')
+                num += 1
+                shutil.copy2(screen.map_file, file_name)
+                screen.map_file = file_name
+
+                if screen.music_file:
+                    file_name = os.path.join(resourcesDir, 'img_'+str(num)+'.png')
+                    num += 1
+                    shutil.copy2(screen.music_file, file_name)
+                    screen.music_file = file_name
+
+                file_name = os.path.join(resourcesDir, 'img_'+str(num)+'.png')
+                num += 1
+                shutil.copy2(screen.protagonist.img_file, file_name)
+                screen.protagonist.img_file = file_name
+
+                file_name = os.path.join(resourcesDir, 'img_'+str(num)+'.png')
+                num += 1
+                shutil.copy2(screen.protagonist.img_dialog, file_name)
+                screen.protagonist.img_dialog = file_name
+
+                for npc in screen.npcs:
+                    file_name = os.path.join(resourcesDir, 'img_'+str(num)+'.png')
+                    num += 1
+                    shutil.copy2(npc.img_file, file_name)
+                    npc.img_file = file_name
+
+                    file_name = os.path.join(resourcesDir, 'img_'+str(num)+'.png')
+                    num += 1
+                    shutil.copy2(npc.img_dialog, file_name)
+                    npc.img_dialog = file_name
+
+            for item in self.game.items:
+                file_name = os.path.join(resourcesDir, 'img_'+str(num)+'.png')
+                num += 1
+                shutil.copy2(item.image_url, file_name)
+                item.image_url = file_name
+
+
+
+            gameFile = os.path.join(tempDir, "game")
+            fileObj = open(gameFile,"w")
+            pickle.dump(self.game,fileObj)
+            fileObj.close()
 
 
             #Add to zip
@@ -712,7 +796,16 @@ class  RPYG_Designer:
             zout = zipfile.ZipFile(zfilename, "w")
             zout.write(gameFile, "game")
             zout.write(resourcesDir, "resources")
+
+            for entity in os.listdir(resourcesDir):
+                f = os.path.join(resourcesDir,entity)
+                name = os.path.join("resources", entity)
+                zout.write(f, name)
+
+
             zout.close()
+
+
 
 
             self.win_rpyg.set_title("RPyG Designer: "+str(os.path.basename(self.game_filename)))
@@ -800,9 +893,12 @@ class  RPYG_Designer:
     ##############
 
 
-    def showMessage(self, text):
-        self.builder.get_object('lblMessage').set_text(text)
-        self.builder.get_object('dlgMessage').set_visible(True)
+    def show_error(self, text):
+        md = gtk.MessageDialog(None,
+            gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_ERROR,
+            gtk.BUTTONS_CLOSE, text)
+        md.run()
+        md.destroy()
 
     def closeMessage(self, text):
         self.builder.get_object('dlgMessage').set_visible(False)
@@ -854,8 +950,7 @@ class  RPYG_Designer:
         return file_name
 
     def debug(self, a):
-        print "self.npc: "+str(self.npc)
-        print "self.npc.img_dialog: "+str(self.npc.img_dialog)
+        print "self.screen.protagonist.max_cols: "+str(self.screen.protagonist.max_cols)
 
 
 

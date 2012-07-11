@@ -3,7 +3,7 @@
 from actor import *
 
 class ScreenExit:
-    def __init__(self, name, screen, pos, keep_items_tokens=True, spawn_pos=None):
+    def __init__(self, name, screen, pos, keep_items_tokens=True, spawn_pos=[0,0]):
         self.name=name
         self.screen=screen
         self.pos=pos
@@ -97,7 +97,7 @@ class Screen:
         else:
             self.valid_path[y][x]=0
 
-    def add_exit(self, name, destiny=None, pos=[0,0], keep_items_tokens=True, spawn_pos=None):
+    def add_exit(self, name, destiny=None, pos=[0,0], keep_items_tokens=True, spawn_pos=[0,0]):
         se=ScreenExit(name,destiny,pos,keep_items_tokens,spawn_pos)
         self.exits.append(se)
         return se
