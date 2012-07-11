@@ -39,7 +39,7 @@ class RPYG:
             print "Error loading game"
             exit()
 
-    def load_screen(self,game,name=''):
+    def load_screen(self,game,screen=None):
         inventory=None
         spawn_pos=None
         tokens=[]
@@ -51,10 +51,8 @@ class RPYG:
 
 
         self.screen=None
-        if (name):
-            for s in game.screens:
-                if s.name==name:
-                    self.screen=s
+        if (screen):
+            self.screen=screen
         else:
             self.screen=game.screens[0]
 
@@ -222,9 +220,10 @@ class RPYG:
                 for npc in self.screen.npcs:
                     npc.draw(self.display)
 
-                for e in self.screen.exits:
-                    e_rect=Rect(int(e.pos[0])*32,int(e.pos[1])*32,32,32)
-                    pygame.draw.rect(self.display, (255, 0, 0), e_rect)
+                #debug for exits
+                #~ for e in self.screen.exits:
+                    #~ e_rect=Rect(int(e.pos[0])*32,int(e.pos[1])*32,32,32)
+                    #~ pygame.draw.rect(self.display, (255, 0, 0), e_rect)
                 self.protagonist.draw(self.display)
                 self.display_copy=self.display.copy()
         elif self.mode==MODE_TALK:
