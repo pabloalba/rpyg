@@ -78,6 +78,7 @@ class Screen:
     def add_npc(self,name):
         npc=NPC(self,name)
         self.npcs.append(npc)
+        return npc
 
     def remove_npc(self,name):
         npc=self.get_npc(name)
@@ -96,9 +97,10 @@ class Screen:
         else:
             self.valid_path[y][x]=0
 
-    def add_exit(self, name, destiny, pos, keep_items_tokens=True, spawn_pos=None):
+    def add_exit(self, name, destiny=None, pos=[0,0], keep_items_tokens=True, spawn_pos=None):
         se=ScreenExit(name,destiny,pos,keep_items_tokens,spawn_pos)
         self.exits.append(se)
+        return se
 
     def remove_exit(self,name):
         for e in self.exits:

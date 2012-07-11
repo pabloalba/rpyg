@@ -109,8 +109,11 @@ class  RPYG_Designer:
         self.win_rpyg=self.builder.get_object('win_rpyg')
 
 
+        self.npc = None
+        self.s_exit = None
+
         #~ self.item=None
-        #~ self.npc=None
+
         #~ self.dialog=None
 
         self.win_rpyg.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("lightgray"))
@@ -129,59 +132,136 @@ class  RPYG_Designer:
 
 
 
+
+
+
         self.builder.get_object('box_npcs').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color("#D3D3D3"))
         self.builder.get_object('box_exits').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color("#D3D3D3"))
         self.builder.get_object('main_area').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color("#D3D3D3"))
+        self.builder.get_object('other_properties').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color("#D3D3D3"))
+        self.builder.get_object('viewport2').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color("#D3D3D3"))
 
-        icon  = self.load_image("./images/pos_map.png", 16, 16)
+        icon  = self.load_image(os.path.join('images','pos_map.png'), 16, 16)
         image = gtk.image_new_from_pixbuf(icon)
         self.builder.get_object('btn_prot_map').set_image(image)
+        image = gtk.image_new_from_pixbuf(icon)
+        self.builder.get_object('btn_npc_map').set_image(image)
+        image = gtk.image_new_from_pixbuf(icon)
+        self.builder.get_object('btn_exit_map').set_image(image)
 
-
+        icon  = self.load_image(os.path.join('images','dialogs.png'), 90)
+        image = gtk.image_new_from_pixbuf(icon)
+        self.builder.get_object('btn_npc_dialogs').set_image(image)
 
 
         self.liststore_maps = None
+        self.liststore_npcs = None
+        self.liststore_exits = None
         self.screen = None
         self.game = Game()
-        self.init_iconview()
+        self.init_iconview_maps()
 
-    def init_iconview(self):
-
-
-        # creo el iconview
+    def init_iconview_maps(self):
+        # set basic properties
         iconview = self.builder.get_object('iconview_maps')
         iconview.set_orientation(gtk.ORIENTATION_HORIZONTAL)
         iconview.set_item_orientation(gtk.ORIENTATION_VERTICAL)
 
-        # le indico qué columna del liststore tiene el texto, y cuál el icono
+        # set columns
         iconview.set_text_column(1)
         iconview.set_pixbuf_column(0)
 
-        # pongo un scrolledwindow, para que quede más bonito
-        scroll = gtk.ScrolledWindow()
-        scroll.set_policy(gtk.POLICY_ALWAYS, gtk.POLICY_ALWAYS)
 
-        # defino los tipos a representar
-        liststore = gtk.ListStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING)
+        # set liststore
+        if (self.liststore_npcs):
+            liststore = self.liststore_maps
+            liststore.clear()
+        else:
+            liststore = gtk.ListStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING)
 
 
-
+        #Add icon for 'add screen'
         add_icon = self.load_image("images/add_map.png", 144, 90)
+        liststore.append([add_icon, "Add screen"])
 
-        liststore.append([add_icon, "Add map"])
-
+        #set liststore
         iconview.set_model(liststore)
         self.liststore_maps = liststore
 
+        #assign event
         iconview.connect('selection_changed', self.on_icon_map_clicked)
 
+        self.win_rpyg.show_all()
 
-        #self.builder.get_object('maps_scroll').add(iconview)
+    def init_iconview_npcs(self):
+        # set basic properties
+        iconview = self.builder.get_object('iconview_npcs')
+        iconview.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+        iconview.set_item_orientation(gtk.ORIENTATION_VERTICAL)
+
+        # set columns
+        iconview.set_text_column(1)
+        iconview.set_pixbuf_column(0)
+
+
+        # set liststore
+        if (self.liststore_npcs):
+            liststore = self.liststore_npcs
+            liststore.clear()
+        else:
+            liststore = gtk.ListStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING)
+
+
+
+        #Add icon for 'add npc'
+        add_icon = self.load_image("images/add_npc.png", 32, 48)
+        liststore.append([add_icon, "Add npc"])
+
+        #set liststore
+        iconview.set_model(liststore)
+        self.liststore_npcs = liststore
+
+        #assign event
+        iconview.connect('selection_changed', self.on_icon_npc_clicked)
 
         self.win_rpyg.show_all()
+
+    def init_iconview_exits(self):
+        # set basic properties
+        iconview = self.builder.get_object('iconview_exits')
+        iconview.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+        iconview.set_item_orientation(gtk.ORIENTATION_VERTICAL)
+
+        # set columns
+        iconview.set_text_column(1)
+        iconview.set_pixbuf_column(0)
+
+
+        # set liststore
+        if (self.liststore_exits):
+            liststore = self.liststore_exits
+            liststore.clear()
+        else:
+            liststore = gtk.ListStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING)
+
+
+
+        #Add icon for 'add exit'
+        add_icon = self.load_image(os.path.join("images","add_exit.png"), 32, 32)
+        liststore.append([add_icon, "Add exit"])
+
+        #set liststore
+        iconview.set_model(liststore)
+        self.liststore_exits = liststore
+
+        #assign event
+        iconview.connect('selection_changed', self.on_icon_exit_clicked)
+
+        self.win_rpyg.show_all()
+
+
 
     def on_icon_map_clicked(self, iconview):
-        self.win_rpyg.show_all()
         selected = iconview.get_selected_items()
         if (len(selected) == 1):
             pos = selected[0][0]
@@ -191,6 +271,38 @@ class  RPYG_Designer:
             else:
                 self.load_screen(pos-1)
 
+    def on_icon_npc_clicked(self, iconview):
+        selected = iconview.get_selected_items()
+        if (len(selected) == 1):
+            pos = selected[0][0]
+            #if it is the first icon, open add dialog
+            if (pos == 0):
+                self.open_npc_dialog(None)
+            else:
+                self.npc = self.screen.npcs[pos-1]
+                self.load_npc_properties(self.screen.npcs[pos-1])
+
+    def on_icon_exit_clicked(self, iconview):
+        selected = iconview.get_selected_items()
+        if (len(selected) == 1):
+            pos = selected[0][0]
+            #if it is the first icon, add exit
+            if (pos == 0):
+                name = "exit "+str(len(self.screen.exits)+1)
+                self.s_exit = self.screen.add_exit(name)
+                #add exit icon
+                pixbuf = self.load_image(os.path.join("images","exit.png"), 32, 32)
+                self.liststore_exits.append([pixbuf, self.s_exit.name])
+                #Select last element
+                pos = len(self.screen.exits)
+                self.builder.get_object('iconview_exits').select_path((pos,))
+                self.load_exit_properties(self.s_exit)
+
+
+
+            else:
+                pass
+
     def load_screen(self, pos):
         self.screen = self.game.screens[pos]
         self.load_map_image(self.screen.map_file)
@@ -198,6 +310,9 @@ class  RPYG_Designer:
         self.builder.get_object('screen_properties').set_sensitive(True)
         self.builder.get_object('txt_screen_name').set_text(self.screen.name)
         self.builder.get_object('txt_screen_music').set_text(str(os.path.basename(self.screen.music_file)))
+        self.load_prot()
+        self.load_npcs()
+        self.load_exits()
 
 
     def open_map_dialog(self,button):
@@ -229,49 +344,199 @@ class  RPYG_Designer:
             self.builder.get_object('iconview_maps').select_path((pos,))
             self.load_screen(pos-1)
 
-    def btn_prot_image_dialogs_clicked(self, button):
+
+    def open_npc_dialog(self,button):
         filename = self.open_file('*.png')
         if (filename):
-            self.screen.protagonist.img_file = filename
-            icon  = self.load_image(filename, 90)
-            image = gtk.image_new_from_pixbuf(icon)
-            button.set_image(image)
+            #Create new npc
+            npc_name = str(os.path.basename(filename))[0:-4]
+
+            #Search more npcs with same name
+            num = 0
+            for n in self.screen.npcs:
+                if n.name.startswith(npc_name):
+                    num += 1
+            if (num > 0):
+                npc_name += str(num)
+
+            npc = self.screen.add_npc(npc_name)
+            self.set_actor_chara(npc, filename)
+
+            #Load and select npc
+            pos = len(self.screen.npcs)
+            self.npc = self.screen.npcs[pos-1]
+            self.add_npc_icon(self.npc)
+            self.load_npc_properties(self.npc)
+            self.builder.get_object('iconview_npcs').select_path((pos,))
+            self.builder.get_object('npc_area').set_sensitive(True)
+
+    def load_exits(self):
+        self.init_iconview_exits()
 
 
+    def load_npcs(self):
+        self.init_iconview_npcs()
+        if (len(self.screen.npcs) == 0 ):
+            self.builder.get_object('npc_name').set_text('')
+            self.builder.get_object('npc_x').set_text('')
+            self.builder.get_object('npc_y').set_text('')
+            self.builder.get_object('npc_area').set_sensitive(False)
+        else:
+            self.builder.get_object('npc_area').set_sensitive(True)
+            #Load npcs
+            i = 0
+            for npc in self.screen.npcs:
+                self.add_npc_icon(npc)
+
+            #Load and select npc
+            pos = len(self.screen.npcs)
+            self.npc = self.screen.npcs[pos-1]
+            self.load_npc_properties(self.npc)
+            self.builder.get_object('iconview_npcs').select_path((pos,))
+
+
+    def add_npc_icon(self, npc):
+        #Add npc icon
+        pixbuf = gtk.gdk.pixbuf_new_from_file(npc.img_file)
+        subpixbuf = pixbuf.subpixbuf(0, 0, 32, 48)
+        self.liststore_npcs.append([subpixbuf, npc.name])
+        self.win_rpyg.show_all()
+
+    def load_npc_properties(self, npc):
+        #Write npc properties
+        self.builder.get_object('npc_name').set_text(npc.name)
+        self.builder.get_object('npc_x').set_text(str(npc.pos[0]))
+        self.builder.get_object('npc_y').set_text(str(npc.pos[1]))
+        self.actor_load_image_dialog(self.builder.get_object('btn_npc_image_dialogs'), self.npc.img_dialog)
+
+    def load_exit_properties(self, s_exit):
+        #Write exit properties
+        self.builder.get_object('exit_name').set_text(s_exit.name)
+        self.builder.get_object('exit_x').set_text(str(s_exit.pos[0]))
+        self.builder.get_object('exit_y').set_text(str(s_exit.pos[1]))
+
+
+    def load_prot(self):
+        name = self.screen.protagonist.name
+        if not name:
+            name = "Protagonist"
+        self.builder.get_object('prot_name').set_text(name)
+        self.builder.get_object('prot_x').set_text(str(self.screen.protagonist.pos[0]))
+        self.builder.get_object('prot_y').set_text(str(self.screen.protagonist.pos[1]))
+        self.actor_load_image_dialog(self.builder.get_object('btn_prot_image_dialogs'), self.screen.protagonist.img_dialog)
+        self.load_prot_chara(self.builder.get_object('btn_prot_image_chara'), self.screen.protagonist.img_file)
+
+
+
+    ###################################################
+    # Actors
+    ###################################################
+
+
+
+    #Protagonist
+    def btn_prot_image_dialogs_clicked(self, button):
+        self.btn_image_dialogs_clicked(button, self.screen.protagonist)
 
     def btn_prot_image_chara_clicked(self, button):
         filename = self.open_file('*.png')
-        if (filename):
+        self.set_actor_chara(self.screen.protagonist, filename)
+        self.load_prot_chara(button, filename)
 
-            pixbuf = gtk.gdk.pixbuf_new_from_file(filename)
-            #Get size
-            width = pixbuf.get_width()
-            height = pixbuf.get_height()
-            self.screen.protagonist.max_rows = width / 32
-            self.screen.protagonist.max_cols = height / 48
-
-
-            self.screen.protagonist.img_dialog = filename
-
-            image = gtk.image_new_from_pixbuf(pixbuf.subpixbuf(0, 0, 32, 48))
-            button.set_image(image)
-
-
+    def load_prot_chara(self, button, filename):
+        if not filename:
+            filename = os.path.join('images','default_dialog_img')
+        pixbuf = gtk.gdk.pixbuf_new_from_file(filename)
+        image = gtk.image_new_from_pixbuf(pixbuf.subpixbuf(0, 0, 32, 48))
+        button.set_image(image)
 
     def btn_prot_map_clicked(self, button):
+        self.btn_map_clicked(button, self.on_prot_map_clicked, self.screen.protagonist.pos[0], self.screen.protagonist.pos[1])
+
+
+    def on_prot_map_clicked(self,screenmap,event):
+        field_x = self.builder.get_object('prot_x')
+        field_y = self.builder.get_object('prot_y')
+        self.on_map_clicked(screenmap,event, self.screen.protagonist, field_x, field_y)
+
+    def update_prot_coordinates(self, field):
+        try:
+            x = int(self.builder.get_object('prot_x').get_text())
+            y = int(self.builder.get_object('prot_y').get_text())
+            pos = [x, y]
+            self.screen.protagonist.pos = pos
+        except:
+            pass
+
+
+    #npc
+    def btn_npc_image_dialogs_clicked(self, button):
+        self.btn_image_dialogs_clicked(button, self.npc)
+
+
+    def btn_npc_map_clicked(self, button):
+        self.btn_map_clicked(button, self.on_npc_map_clicked, self.npc.pos[0], self.npc.pos[1])
+
+    def on_npc_map_clicked(self,screenmap,event):
+        field_x = self.builder.get_object('npc_x')
+        field_y = self.builder.get_object('npc_y')
+        self.on_map_clicked(screenmap, event, self.npc, field_x, field_y)
+
+    def update_npc_coordinates(self, a, b):
+        try:
+            x = int(self.builder.get_object('npc_x').get_text())
+            y = int(self.builder.get_object('npc_y').get_text())
+            pos = [x, y]
+            self.npc.pos = pos
+        except:
+            pass
+
+    #exit
+    def btn_exit_map_clicked(self, button):
+        self.btn_map_clicked(button, self.on_exit_map_clicked, self.s_exit.pos[0], self.s_exit.pos[1])
+
+    def on_exit_map_clicked(self,screenmap,event):
+        field_x = self.builder.get_object('exit_x')
+        field_y = self.builder.get_object('exit_y')
+        self.on_map_clicked(screenmap,event, self.s_exit, field_x, field_y)
+
+
+    #actors
+    def set_actor_chara(self, actor, filename):
+        pixbuf = gtk.gdk.pixbuf_new_from_file(filename)
+        #Get size
+        width = pixbuf.get_width()
+        height = pixbuf.get_height()
+        actor.max_rows = width / 32
+        actor.max_cols = height / 48
+        actor.img_file = filename
+        return pixbuf
+
+    def btn_image_dialogs_clicked(self, button, actor):
+        filename = self.open_file('*.png')
+        self.actor_load_image_dialog(button, filename)
+        actor.img_dialog = filename
+
+
+    def actor_load_image_dialog(self, button, filename):
+        if not filename:
+            filename = os.path.join('images','default_dialog_img')
+        icon  = self.load_image(filename, 90)
+        image = gtk.image_new_from_pixbuf(icon)
+        button.set_image(image)
+
+
+    def btn_map_clicked(self, button, callback, x, y):
         filepath=self.screen.map_file
         if (filepath):
             drawing_area = gtk.DrawingArea()
             map_screen = MapScreen(filepath,self.screen)
             map_screen.show()
-            map_screen.connect("button_press_event", self.on_prot_map_clicked)
+            map_screen.connect("button_press_event", callback)
             map_screen.set_events(gtk.gdk.BUTTON_PRESS_MASK)
             win_map = self.builder.get_object('win_map')
 
             try:
-                x = int(self.builder.get_object('prot_x').get_text())
-                y = int(self.builder.get_object('prot_y').get_text())
-
                 map_screen.mark_x = x
                 map_screen.mark_y = y
             except:
@@ -281,25 +546,22 @@ class  RPYG_Designer:
             win_map.set_size_request(1024, 768)
             win_map.set_visible(True)
 
-    def on_prot_map_clicked(self,screenmap,event):
+    def on_map_clicked(self, screenmap, event, actor, field_x, field_y):
         if event.button==1:
             x=int(math.floor(event.x/32))
             y=int(math.floor(event.y/32))
-            self.builder.get_object('prot_x').set_text(str(x))
-            self.builder.get_object('prot_y').set_text(str(y))
+            field_x.set_text(str(x))
+            field_y.set_text(str(y))
             self.builder.get_object('win_map').destroy()
             pos = [x, y]
-            self.screen.protagonist.pos = pos
+            actor.pos = pos
 
-    def update_prot_coordinates(self, fiels):
-        try:
-            x = int(self.builder.get_object('prot_x').get_text())
-            y = int(self.builder.get_object('prot_y').get_text())
-            pos = [x, y]
-            self.screen.protagonist.pos = pos
-        except:
-            pass
 
+
+
+    ##########################
+    # Generals
+    ##########################
 
 
     def exit_rpyg(self,window):
@@ -409,8 +671,23 @@ class  RPYG_Designer:
 
 
 
-    def screen_name_change(self, field):
+    def screen_name_change(self, field, event):
         self.screen.name = field.get_text()
+        selected = self.builder.get_object('iconview_maps').get_selected_items()
+        if (len(selected) == 1):
+            pos = selected[0][0]
+            self.liststore_maps[pos][1]=self.screen.name
+
+
+    def prot_name_change(self, field, event):
+        self.screen.protagonist.name = field.get_text()
+
+    def npc_name_change(self, field, event):
+        self.npc.name = field.get_text()
+        selected = self.builder.get_object('iconview_npcs').get_selected_items()
+        if (len(selected) == 1):
+            pos = selected[0][0]
+            self.liststore_npcs[pos][1]=self.npc.name
 
     def screen_music_select(self, button):
         filename = self.open_file ("*.ogg *.mp3")
@@ -504,6 +781,11 @@ class  RPYG_Designer:
             file_name = dialog.get_filename()
         dialog.destroy()
         return file_name
+
+    def debug(self, a):
+        print "self.npc: "+str(self.npc)
+        print "self.npc.img_dialog: "+str(self.npc.img_dialog)
+
 
 
 
