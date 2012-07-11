@@ -107,7 +107,6 @@ class  RPYG_Designer:
         self.builder.connect_signals(self)
 
         self.game_filename=''
-        self.game_dir=''
 
         self.win_rpyg=self.builder.get_object('win_rpyg')
 
@@ -693,13 +692,11 @@ class  RPYG_Designer:
         self.clear_current()
         filename = self.open_file('*.rpyg')
         if (filename):
+            self.game_filename = filename
             game = rpyg_utils.open_game(filename)
             if (game):
                 self.game = game[0]
                 tempDir = game[1]
-
-                self.game_filename=os.path.join(tempDir, "game")
-                self.game_dir=tempDir
 
                 self.load_screens()
                 #~ self.load_tokens()
@@ -735,7 +732,6 @@ class  RPYG_Designer:
         if (self.game_filename):
             #Create temp dir
             tempDir = tempfile.mkdtemp(prefix = 'RPyG')
-            self.game_dir = tempDir
 
 
             resourcesDir = os.path.join(tempDir, "resources")
@@ -804,9 +800,6 @@ class  RPYG_Designer:
 
 
             zout.close()
-
-
-
 
             self.win_rpyg.set_title("RPyG Designer: "+str(os.path.basename(self.game_filename)))
 
