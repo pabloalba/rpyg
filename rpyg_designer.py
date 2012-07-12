@@ -163,15 +163,18 @@ class  RPYG_Designer:
         self.liststore_npcs = None
         self.liststore_exits = None
         self.liststore_tokens = None
+        self.liststore_items = None
         
         self.screen = None
         self.npc = None
         self.s_exit = None
         self.token = None
+        self.item = None
         
         self.game = Game()
         self.init_iconview_maps()
         self.init_iconview_tokens()
+        self.init_iconview_items()
 
     def init_iconview_maps(self):
         # set basic properties
@@ -234,6 +237,38 @@ class  RPYG_Designer:
 
         #assign event
         iconview.connect('selection_changed', self.on_icon_token_clicked)
+
+        self.win_rpyg.show_all()
+        
+    def init_iconview_items(self):
+        # set basic properties
+        iconview = self.builder.get_object('iconview_items')
+        iconview.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+        iconview.set_item_orientation(gtk.ORIENTATION_VERTICAL)
+
+        # set columns
+        iconview.set_text_column(1)
+        iconview.set_pixbuf_column(0)
+
+
+        # set liststore
+        if (self.liststore_items):
+            liststore = self.liststore_items
+            liststore.clear()
+        else:
+            liststore = gtk.ListStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING)
+
+
+        #Add icon for 'add item'
+        add_icon = self.load_image("images/add_item.png", 32, 32)
+        liststore.append([add_icon, "Add item"])
+
+        #set liststore
+        iconview.set_model(liststore)
+        self.liststore_items = liststore
+
+        #assign event
+        iconview.connect('selection_changed', self.on_icon_item_clicked)
 
         self.win_rpyg.show_all()
 
@@ -353,7 +388,7 @@ class  RPYG_Designer:
             #if it is the first icon, add token
             if (pos == 0):
                 name = "token "+str(len(self.game.tokens)+1)
-                self.game.add_token(name)
+                token = self.game.add_token(name)
                 
                 #add token icon
                 pixbuf = self.load_image(os.path.join("images","token.png"), 32, 32)
@@ -361,11 +396,24 @@ class  RPYG_Designer:
                 #Select last element
                 pos = len(self.game.tokens)
                 self.builder.get_object('iconview_tokens').select_path((pos,))
-                self.load_token_properties(name)
+                self.load_token_properties(token)
+                self.token = token
 
             else:
                 self.token = self.game.tokens[pos-1]
                 self.load_token_properties(self.token)
+                
+    def on_icon_item_clicked(self, iconview):
+        selected = iconview.get_selected_items()
+        if (len(selected) == 1):
+            pos = selected[0][0]
+            #if it is the first icon, open add dialog
+            if (pos == 0):
+                self.open_item_dialog(None)
+            else:
+                self.item = self.game.items[pos-1]
+                self.load_item_properties(self.item)
+                
 
 
     def on_exit_keep_toggled(self, button):
@@ -441,7 +489,34 @@ class  RPYG_Designer:
                 self.builder.get_object('npc_area').set_sensitive(True)
             else:
                 self.screen.npcs.remove(npc)
+                
+                
+    def open_item_dialog(self,button):
+        filename = self.open_file('*.png *.jpg')
+        if (filename):
+            #Create new item
+            item_name = str(os.path.basename(filename))[0:-4]
 
+            #Search more items with same name
+            num = 0
+            for n in self.game.items:
+                if n.name.startswith(item_name):
+                    num += 1
+            if (num > 0):
+                item_name += str(num)
+            
+            item = self.game.add_item(item_name)
+            item.image_url = filename
+            
+            #add item icon
+            pixbuf = self.load_image(filename, 32, 32)
+            self.liststore_items.append([pixbuf, item_name])
+            #Select last element
+            pos = len(self.game.items)
+            self.builder.get_object('iconview_items').select_path((pos,))
+            self.load_item_properties(item)
+            self.item = self.game.items[pos-1]
+            
     def load_exits(self):
         self.init_iconview_exits()
         self.builder.get_object('exit_name').set_text('')
@@ -483,6 +558,17 @@ class  RPYG_Designer:
                 pixbuf = self.load_image(os.path.join("images","token.png"), 32, 32)
                 self.liststore_tokens.append([pixbuf, t.name])
 
+    def load_items(self):
+        self.init_iconview_items()
+        self.builder.get_object('item_name').set_text('')
+        self.builder.get_object('item_area').set_sensitive(False)
+        if (len(self.game.items) != 0 ):
+            #Load items
+            i = 0
+            for item in self.game.items:
+                pixbuf = self.load_image(item.image_url, 32, 32)
+                self.liststore_items.append([pixbuf, item.name])
+
 
     def add_npc_icon(self, npc):
         #Add npc icon
@@ -518,6 +604,11 @@ class  RPYG_Designer:
         self.builder.get_object('token_area').set_sensitive(True)
         #Write token properties
         self.builder.get_object('token_name').set_text(token.name)
+        
+    def load_item_properties(self, item):
+        self.builder.get_object('item_area').set_sensitive(True)
+        #Write token properties
+        self.builder.get_object('item_name').set_text(item.name)
 
     def load_prot(self):
         name = self.screen.protagonist.name
@@ -771,6 +862,7 @@ class  RPYG_Designer:
         self.npc = None
         self.s_exit = None
         self.token = None
+        self.item = None
 
 
 
@@ -787,7 +879,7 @@ class  RPYG_Designer:
 
                 self.load_screens()
                 self.load_tokens()
-                #~ self.load_items()
+                self.load_items()
 
                 self.win_rpyg.set_title("RPyG Designer: "+str(os.path.basename(filename)))
                 self.builder.get_object('main_area').set_sensitive(True)
@@ -942,6 +1034,14 @@ class  RPYG_Designer:
                 pos = selected[0][0]
                 self.liststore_tokens[pos][1]=name
                 
+    def on_item_name_changed(self, field):
+        name = field.get_text()
+        if (name):                        
+            selected = self.builder.get_object('iconview_items').get_selected_items()
+            if (len(selected) == 1):
+                self.item.name = name
+                pos = selected[0][0]
+                self.liststore_items[pos][1]=name
                 
 
     def screen_music_select(self, button):

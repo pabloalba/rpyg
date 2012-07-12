@@ -144,6 +144,7 @@ class Game:
     def add_item(self,name):
         it=Item(name,self)
         self.items.append(it)
+        return it
 
     def remove_item(self,name):
         item=self.get_item(name)
