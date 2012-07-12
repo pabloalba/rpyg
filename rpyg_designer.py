@@ -370,17 +370,19 @@ class  RPYG_Designer:
                     num += 1
             if (num > 0):
                 npc_name += str(num)
-
+            
             npc = self.screen.add_npc(npc_name)
-            self.set_actor_chara(npc, filename)
-
-            #Load and select npc
-            pos = len(self.screen.npcs)
-            self.npc = self.screen.npcs[pos-1]
-            self.add_npc_icon(self.npc)
-            self.load_npc_properties(self.npc)
-            self.builder.get_object('iconview_npcs').select_path((pos,))
-            self.builder.get_object('npc_area').set_sensitive(True)
+            pixbuf = self.set_actor_chara(npc, filename)
+            if (pixbuf):                
+                #Load and select npc
+                pos = len(self.screen.npcs)
+                self.npc = self.screen.npcs[pos-1]
+                self.add_npc_icon(self.npc)
+                self.load_npc_properties(self.npc)
+                self.builder.get_object('iconview_npcs').select_path((pos,))
+                self.builder.get_object('npc_area').set_sensitive(True)
+            else:
+                self.screen.npcs.remove(npc)
 
     def load_exits(self):
         self.init_iconview_exits()
@@ -471,8 +473,9 @@ class  RPYG_Designer:
 
     def btn_prot_image_chara_clicked(self, button):
         filename = self.open_file('*.png')
-        self.set_actor_chara(self.screen.protagonist, filename)
-        self.load_prot_chara(button, filename)
+        pixbuf = self.set_actor_chara(self.screen.protagonist, filename)
+        if (pixbuf):
+            self.load_prot_chara(button, filename)
 
     def load_prot_chara(self, button, filename):
         if not filename:
@@ -599,17 +602,26 @@ class  RPYG_Designer:
 
     #actors
     def set_actor_chara(self, actor, filename):
-        pixbuf = gtk.gdk.pixbuf_new_from_file(filename)
-        #Get size
-        width = pixbuf.get_width()
-        height = pixbuf.get_height()
-        actor.max_rows = width / 32
-        actor.max_cols = height / 48
-        actor.img_file = filename
-        return pixbuf
+        try:
+            pixbuf = gtk.gdk.pixbuf_new_from_file(filename)
+            #Get size
+            width = pixbuf.get_width()
+            height = pixbuf.get_height()
+            
+            if (width % 32 != 0) or (height % 48 != 0):
+                self.show_error ("Chara file not valid. Must be an image of 32x48 charas")
+                return None
+            
+            actor.max_rows = width / 32
+            actor.max_cols = height / 48
+            actor.img_file = filename
+            return pixbuf
+        except:
+            self.show_error ("Chara file not valid. Must be an image of 32x48 charas")
+            return None
 
     def btn_image_dialogs_clicked(self, button, actor):
-        filename = self.open_file('*.png')
+        filename = self.open_file('*.png *.jpg')
         self.actor_load_image_dialog(button, filename)
         actor.img_dialog = filename
 

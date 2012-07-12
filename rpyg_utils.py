@@ -31,6 +31,7 @@ def load_image(filename, transparent=False):
         return image
 
 def play_background_music(soundfile):
+    pygame.mixer.quit()
     pygame.mixer.init()
     pygame.mixer.music.load(soundfile)
     pygame.mixer.music.play(-1)

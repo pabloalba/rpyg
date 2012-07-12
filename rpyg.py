@@ -91,8 +91,9 @@ class RPYG:
         self.screen.walls=walls
 
         self.pending_moves=[]
-
-        #play_background_music("/home/palba/tmp/1.mp3")
+        
+        if (self.screen.music_file):
+            play_background_music(self.screen.music_file)
 
 
 
