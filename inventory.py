@@ -57,7 +57,11 @@ class Inventory():
         self.protagonist=protagonist
         
     def init_display(self):
-        self.image = load_image(IMG_SUITCASE,True)
+        self.image = pygame.Surface((600, 480))
+        self.image.fill((0, 0, 0))
+        e_rect=Rect(3,3,594,474)
+        pygame.draw.rect(self.image, (180, 74, 17), e_rect)
+        
         self.posx=212
         self.posy=150
         

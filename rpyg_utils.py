@@ -20,7 +20,6 @@ HEIGHT = 768
 
 
 PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
-IMG_SUITCASE=PROJECT_ROOT+'/images/suitcase.png'
 
 WIDTH=1024
 HEIGHT=768
