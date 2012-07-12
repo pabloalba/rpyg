@@ -22,5 +22,5 @@ setup(
     description = "RPyG app",
     executables = [RPyGExecutable],
     options = {"build_exe":build_exe_options},
-    data_files = my_data_files,
+    #~ data_files = my_data_files,
     )
