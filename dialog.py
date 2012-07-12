@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Modules
-from utils import *
+from rpyg_utils import *
 from inventory import *
 import sys, pygame
 from pygame.locals import *
@@ -84,13 +84,13 @@ class Dialog:
             if phrase.by_npc:
                 y=10
                 photo_x=WIDTH-210
-                photo_y=y+10
+                photo_y=y+20
                 text_x=90
                 image_dialog=self.npc.image_dialog
             else:
                 y=HEIGHT-100
                 photo_x=80
-                photo_y=y-130
+                photo_y=y-30
                 text_x=310
                 image_dialog=protagonist.image_dialog
                       

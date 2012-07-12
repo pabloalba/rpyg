@@ -4,7 +4,7 @@
 # Modules
 import sys, pygame
 from pygame.locals import *
-from utils import *
+from rpyg_utils import *
  
  
 # Classes

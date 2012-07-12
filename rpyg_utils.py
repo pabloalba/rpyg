@@ -18,17 +18,49 @@ import pickle
 WIDTH = 1024
 HEIGHT = 768
 
+
+PROJECT_ROOT = os.path.dirname(os.path.realpath(__file__))
+IMG_SUITCASE=PROJECT_ROOT+'/images/suitcase.png'
+
+WIDTH=1024
+HEIGHT=768
+
+MODE_GAME=0
+MODE_INVENTORY=1
+MODE_TALK=2
+MODE_CUT_SCENE=3
+MODE_END_GAME=4
+MODE_FIRST_DIALOG=5
+MODE_CUT_SCENE_REMOVE=6
+
+
+FREQ = 44100   # same as audio CD
+BITSIZE = -16  # unsigned 16 bit
+CHANNELS = 2   # 1 == mono, 2 == stereo
+BUFFER = 1024  # audio buffer size in no. of samples
+FRAMERATE = 30 # how often to check if playback has finished
+
+
+
 # Functions
 # ---------------------------------------------------------------------
-def load_image(filename, transparent=False):
-        try: image = pygame.image.load(filename)
-        except pygame.error, message:
-                raise SystemExit, message
-        image = image.convert()
-        if transparent:
-                color = image.get_at((0,0))
-                image.set_colorkey(color, RLEACCEL)
-        return image
+def load_image(filename, transparent=False, width=-1, height=-1):
+    try:
+        image = pygame.image.load(filename)
+        if (width!=-1):
+            if (height==-1):
+                #calc height
+                height = image.get_height() * width / image.get_width()
+            image = pygame.transform.scale(image, (width, height))
+
+    except pygame.error, message:
+        raise SystemExit, message
+    image = image.convert()
+    if transparent:
+        color = image.get_at((0,0))
+        image.set_colorkey(color, RLEACCEL)
+    return image
+        
 
 def play_background_music(soundfile):
     pygame.mixer.quit()
@@ -147,3 +179,14 @@ def open_game(filename):
             return [game, tempDir]
         except:
             return None
+
+
+
+def draw_text(screen,text, posx, posy, color=(255, 255, 255), size=24):
+    font=pygame.font.SysFont("Vera", size)
+    #~ font = pygame.font.Font('/home/dodger/Dropbox/proyectos/pygame/rpyg/images/DroidSans.ttf', size)
+    result = pygame.font.Font.render(font, text, 1, color)
+    result_rect = result.get_rect()
+    result_rect.left = posx
+    result_rect.top = posy
+    screen.blit(result, result_rect)

@@ -171,7 +171,6 @@ class  RPYG_Designer:
         self.builder.get_object('box_dialog').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color('#606060'))
         self.builder.get_object('box_results').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color('#606060'))
         
-        self.builder.get_object('win_dialogs').set_visible(False)
         
 
 
@@ -329,7 +328,6 @@ class  RPYG_Designer:
         #assign event
         iconview.connect('selection_changed', self.on_icon_dialog_clicked)
 
-        self.builder.get_object('win_dialogs').show_all()
         
     def init_iconview_phrase(self):
         # set basic properties
@@ -353,6 +351,9 @@ class  RPYG_Designer:
         #set liststore
         iconview.set_model(liststore)
         self.liststore_phrase = liststore
+        
+        #assign event
+        iconview.connect('selection_changed', self.on_icon_phrase_clicked)
 
         self.builder.get_object('win_dialogs').show_all()
         
@@ -988,19 +989,58 @@ class  RPYG_Designer:
 
 
     def on_btn_add_dialog_prot_activate(self, button):
-        self.phrase = self.dialog.add_phrase('',False)
-        #add icon
-        pixbuf = self.load_image(os.path.join("images","dialog_prot.png"))
-        self.liststore_phrase.append([pixbuf, ''])
-        #Select last element
-        pos = len(self.dialog.phrases)
-        self.builder.get_object('iconview_phrase').select_path((pos,))
-        #self.load_phrase_properties(self.phrase)
-        
-        
+        self.dialog_add_phrase(False)
     
     def on_btn_add_dialog_npc_clicked(self, button):
-        pass
+        self.dialog_add_phrase(True)
+        
+    def dialog_add_phrase(self, isNPC):
+        self.phrase = self.dialog.add_phrase('',isNPC)
+        #add icon
+        if (isNPC):
+            pixbuf = self.load_image(os.path.join("images","dialog_npc.png"))
+        else:
+            pixbuf = self.load_image(os.path.join("images","dialog_prot.png"))
+            
+        self.liststore_phrase.append([pixbuf, ''])
+        
+        #Select last element
+        pos = len(self.dialog.phrases)
+        self.builder.get_object('iconview_phrase').select_path((pos-1,))
+        self.load_phrase_properties(self.phrase)
+        
+    def load_phrase_properties(self, phrase):
+        self.builder.get_object('phrase').set_text(phrase.text)
+
+    def on_icon_phrase_clicked(self, iconview):
+        selected = iconview.get_selected_items()
+        if (len(selected) == 1):
+            pos = selected[0][0]
+            self.phrase = self.dialog.phrases[pos]
+            self.load_phrase_properties(self.phrase)
+            
+    def on_phrase_changed(self, field):
+        if (field.get_text()):            
+            selected = self.builder.get_object('iconview_phrase').get_selected_items()
+            if (len(selected) == 1):
+                self.phrase.text = field.get_text()
+                pos = selected[0][0]
+                self.liststore_phrase[pos][1]=self.phrase.text
+                
+
+
+#~ 
+        #~ - load a pixbuf with the image from a file using
+#~ gtk.gdk.pixbuf_new_from_file()
+#~ - create a pixmap of the same size using gtk.gdk.Pixmap() or
+#~ gtk.gdk.Pixbuf.render_pixmap_and_mask()
+#~ - draw the pixbuf image on the pixmap using
+#~ gtk.gdk.Drawable.draw_pixbuf() (not needed if render_pixmap_and_mask was
+#~ used)
+#~ - draw your text, lines, etc. in the pixmap using either the cairo or
+#~ gtk methods
+#~ - transfer the pixmap to the pixbuf using gtk.gdk.Pixbuf.get_from_drawable()
+#~ - write out the image using gtk.gdk.Pixbuf.save()
 
 
 

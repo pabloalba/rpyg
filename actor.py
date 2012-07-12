@@ -37,7 +37,7 @@ class Actor:
         self.rect = self.image.get_rect()
         self.rect.topleft=[self.pos[0]*32,self.pos[1]*32]
         if self.img_dialog:
-            self.image_dialog=load_image(self.img_dialog,True)
+            self.image_dialog=load_image(self.img_dialog,False, 90)
         else:
             self.img_dialog=None
 
