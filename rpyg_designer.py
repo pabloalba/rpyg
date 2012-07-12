@@ -1025,7 +1025,6 @@ class  RPYG_Designer:
                 
 
     def load_dialog_properties(self, dialog):
-        
         self.builder.get_object('iconview_conditions').handler_block(self.conditions_handler)
         self.builder.get_object('dialog_area').set_sensitive(True)
         #Write dialog properties
@@ -1042,6 +1041,7 @@ class  RPYG_Designer:
         for token in self.game.tokens:
             if token in dialog.conditions:
                 self.builder.get_object('iconview_conditions').select_path((pos,))
+            pos += 1
                 
         self.builder.get_object('iconview_conditions').handler_unblock(self.conditions_handler)
             
@@ -1077,13 +1077,14 @@ class  RPYG_Designer:
 
         iconview.set_model(liststore)
         
-    def on_icon_conditions_clicked(self, iconview):        
+    def on_icon_conditions_clicked(self, iconview): 
         selected = iconview.get_selected_items()
         self.dialog.conditions = []
         if (len(selected) > 0):
             for s in selected:                
                 pos = s[0]
                 self.dialog.conditions.append(self.game.tokens[pos])
+                
                 
 
 #~ 
