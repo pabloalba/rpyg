@@ -40,6 +40,16 @@ BUFFER = 1024  # audio buffer size in no. of samples
 FRAMERATE = 30 # how often to check if playback has finished
 
 
+#result types
+RESULT_REMOVE_NPC = 0
+RESULT_ADD_TOKEN = 1 
+RESULT_REMOVE_TOKEN = 2
+RESULT_ADD_ITEM = 3
+RESULT_REMOVE_ITEM = 4
+RESULT_MOVE_NPC = 5
+RESULT_END_GAME = 5
+
+
 
 # Functions
 # ---------------------------------------------------------------------

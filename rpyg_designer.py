@@ -166,7 +166,12 @@ class  RPYG_Designer:
         
         self.builder.get_object('box_conditions').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color('#606060'))
         self.builder.get_object('box_dialog').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color('#606060'))
-        self.builder.get_object('box_results').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color('#606060'))
+        self.builder.get_object('box_results').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color('#606060'))        
+        #Init for combos
+        cell = gtk.CellRendererText()
+        self.builder.get_object('cmb_results').pack_start(cell, True)
+        self.builder.get_object('cmb_results').add_attribute(cell, "text", 0)
+        
         
         
 
@@ -178,6 +183,7 @@ class  RPYG_Designer:
         self.liststore_items = None
         self.liststore_dialogs = None
         self.liststore_phrase = None
+        self.liststore_results = None
         
         self.conditions_handler = None
         
@@ -188,12 +194,25 @@ class  RPYG_Designer:
         self.item = None
         self.dialog = None
         self.phrase = None
+        self.result = None
+        
+        self.select_window_cancel_callback = None
+        self.select_window_ok_callback = None
         
         self.game = Game()
         self.init_iconview_maps()
         self.init_iconview_tokens()
         self.init_iconview_items()
         self.init_iconview_dialogs()
+        
+        
+        self.builder.get_object('liststore_results')
+        
+        
+        
+
+
+        
         
         if (game_file):
             self.open_game_file(game_file)
@@ -327,7 +346,6 @@ class  RPYG_Designer:
         #assign event
         iconview.connect('selection_changed', self.on_icon_dialog_clicked)
 
-        
     def init_iconview_phrase(self):
         # set basic properties
         iconview = self.builder.get_object('iconview_phrase')
@@ -355,7 +373,39 @@ class  RPYG_Designer:
         iconview.connect('selection_changed', self.on_icon_phrase_clicked)
 
         self.builder.get_object('win_dialogs').show_all()
+
         
+    def init_iconview_results(self):
+        # set basic properties
+        iconview = self.builder.get_object('iconview_results')
+        iconview.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+        iconview.set_item_orientation(gtk.ORIENTATION_VERTICAL)
+
+        # set columns
+        iconview.set_text_column(1)
+        iconview.set_pixbuf_column(0)
+
+
+        # set liststore
+        if (self.liststore_results):
+            liststore = self.liststore_results
+            liststore.clear()
+        else:
+            liststore = gtk.ListStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING)
+
+
+        #Add icon for 'add result'
+        add_icon = self.load_image("images/add_result.png", 32, 32)
+        liststore.append([add_icon, "Add result"])
+
+        #set liststore
+        iconview.set_model(liststore)
+        self.liststore_results = liststore
+
+        #assign event
+        iconview.connect('selection_changed', self.on_icon_result_clicked)
+
+        self.win_rpyg.show_all()
         
 
     def init_iconview_npcs(self):
@@ -488,6 +538,28 @@ class  RPYG_Designer:
             else:
                 self.token = self.game.tokens[pos-1]
                 self.load_token_properties(self.token)
+                
+    def on_icon_result_clicked(self, iconview):
+        selected = iconview.get_selected_items()
+        if (len(selected) == 1):
+            pos = selected[0][0]
+            #if it is the first icon, add result
+            if (pos == 0):
+                name = "result "+str(len(self.dialog.results)+1)
+                result = self.dialog.add_result(name)
+                
+                #add result icon
+                pixbuf = self.load_image(os.path.join("images","result.png"), 32, 32)
+                self.liststore_results.append([pixbuf, name])
+                #Select last element
+                pos = len(self.dialog.results)
+                self.builder.get_object('iconview_results').select_path((pos,))
+                self.result = result
+                self.load_result_properties(self.result)
+
+            else:
+                self.result = self.dialog.results[pos-1]
+                self.load_result_properties(self.result)
                 
     def on_icon_item_clicked(self, iconview):
         selected = iconview.get_selected_items()
@@ -668,6 +740,7 @@ class  RPYG_Designer:
     def load_dialogs(self):
         self.init_iconview_dialogs()
         self.init_iconview_conditions()
+        self.init_iconview_results()
         self.builder.get_object('dialog_name').set_text('')
         self.builder.get_object('dialog_area').set_sensitive(False)
         if (len(self.npc.dialogs) != 0 ):
@@ -687,6 +760,27 @@ class  RPYG_Designer:
             for item in self.game.items:
                 pixbuf = self.load_image(item.image_url, 32, 32)
                 self.liststore_items.append([pixbuf, item.name])
+                
+    def load_results(self):
+        self.init_iconview_results()
+        self.builder.get_object('cmb_results').set_active(-1)
+        self.builder.get_object('btn_result_token').set_label('')
+        self.builder.get_object('btn_result_item').set_label('')
+        
+        icon  = self.load_image(os.path.join('images','void.png'))
+        image = gtk.image_new_from_pixbuf(icon)
+        self.builder.get_object('btn_result_token').set_image(image)
+        image = gtk.image_new_from_pixbuf(icon)
+        self.builder.get_object('btn_result_item').set_image(image)
+        
+        
+        self.builder.get_object('result_area').set_sensitive(False)
+        if (len(self.game.results) != 0 ):
+            #Load results
+            i = 0
+            for t in self.game.results:
+                pixbuf = self.load_image(os.path.join("images","result.png"), 32, 32)
+                self.liststore_results.append([pixbuf, t.name])
 
 
     def add_npc_icon(self, npc):
@@ -840,50 +934,33 @@ class  RPYG_Designer:
 
 
     def btn_destiny_map_clicked(self, button):
-        iconview = self.builder.get_object('iconview_destiny')
-        #liststore
-        liststore = iconview.get_model()
-        if (not liststore):
-            # set basic properties
-
-            iconview.set_orientation(gtk.ORIENTATION_HORIZONTAL)
-            iconview.set_item_orientation(gtk.ORIENTATION_VERTICAL)
-
-            # set columns
-            iconview.set_text_column(1)
-            iconview.set_pixbuf_column(0)
-
-            liststore = gtk.ListStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING)
-        else:
-            liststore.clear()
-
-        ignore = True #Ignore the first element
-        for o in self.liststore_maps:
-            if (ignore):
-                ignore = False
-            else:
-                liststore.append(o)
-
-        iconview.set_model(liststore)
-
-        self.builder.get_object('win_screens').set_visible(True)
+        self.show_window_select(self.liststore_maps, self.on_btn_destiny_ok_clicked, self.on_btn_destiny_cancel_clicked)
 
     def on_btn_destiny_cancel_clicked(self, button):
-        self.builder.get_object('win_screens').set_visible(False)
+        pass
 
     def on_btn_destiny_ok_clicked(self, button):
-        iconview = self.builder.get_object('iconview_destiny')
+        iconview = self.builder.get_object('iconview_select')
         selected = iconview.get_selected_items()
-        pos = selected[0][0]
-        self.s_exit.screen = self.game.screens[pos]
-        self.builder.get_object('destiny_name').set_text(self.s_exit.screen.name)
-        self.builder.get_object('win_screens').set_visible(False)
-        self.btn_map_clicked(button, self.on_destiny_map_clicked, self.s_exit.spawn_pos[0], self.s_exit.spawn_pos[1], self.s_exit.screen.map_file)
+        if len(selected)==1:
+            pos = selected[0][0]
+            self.s_exit.screen = self.game.screens[pos]
+            self.builder.get_object('destiny_name').set_text(self.s_exit.screen.name)
+            self.btn_map_clicked(button, self.on_destiny_map_clicked, self.s_exit.spawn_pos[0], self.s_exit.spawn_pos[1], self.s_exit.screen.map_file)
 
     def on_destiny_map_clicked(self,screenmap,event):
         field_x = self.builder.get_object('destiny_x')
         field_y = self.builder.get_object('destiny_y')
         self.s_exit.spawn_pos = self.on_map_clicked(screenmap, event, field_x, field_y)
+
+
+
+
+
+
+
+
+
 
     #actors
     def set_actor_chara(self, actor, filename):
@@ -975,7 +1052,6 @@ class  RPYG_Designer:
         
         self.load_dialogs()
         
-        
         self.builder.get_object('win_dialogs').set_visible(True)
     
     def on_btn_dialog_ok_clicked(self, button):
@@ -1031,6 +1107,7 @@ class  RPYG_Designer:
         self.builder.get_object('dialog_name').set_text(dialog.name)
         self.init_iconview_phrase()
         self.init_iconview_conditions()
+        self.init_iconview_results()
                 
         #Load phrases
         for p in dialog.phrases:
@@ -1044,6 +1121,65 @@ class  RPYG_Designer:
             pos += 1
                 
         self.builder.get_object('iconview_conditions').handler_unblock(self.conditions_handler)
+        
+        
+        #load results
+        self.builder.get_object('result_area').set_sensitive(False)
+        for result in self.dialog.results:
+            pixbuf = gtk.gdk.pixbuf_new_from_file(os.path.join('images','result.png'))
+            self.liststore_results.append([pixbuf, result.name])
+            
+            
+            
+                
+        
+    def clear_result_properties(self):
+        self.builder.get_object('btn_result_token').set_label('')
+        self.builder.get_object('btn_result_item').set_label('')
+        
+        icon  = self.load_image(os.path.join('images','void.png'))
+        image = gtk.image_new_from_pixbuf(icon)
+        self.builder.get_object('btn_result_token').set_image(image)
+        image = gtk.image_new_from_pixbuf(icon)
+        self.builder.get_object('btn_result_item').set_image(image)
+        
+        self.builder.get_object('lbl_select_token').set_sensitive(False)
+        self.builder.get_object('btn_result_token').set_sensitive(False)
+        self.builder.get_object('lbl_select_item').set_sensitive(False)
+        self.builder.get_object('btn_result_item').set_sensitive(False)
+        
+            
+    def load_result_properties(self, result):
+        self.clear_result_properties()
+        self.builder.get_object('result_area').set_sensitive(True)        
+        combo = self.builder.get_object('cmb_results')
+        combo.set_active(result.result_type)
+        self.on_cmb_results_changed(combo)
+        
+        if (result.item):
+            icon  = self.load_image(result.item.image_url, 32, 32)
+            image = gtk.image_new_from_pixbuf(icon)
+            self.builder.get_object('btn_result_item').set_image(image)
+            self.builder.get_object('btn_result_item').set_label(result.item.name)
+        elif (result.token):
+            icon  = self.load_image(os.path.join('images','token.png'), 32, 32)
+            image = gtk.image_new_from_pixbuf(icon)
+            self.builder.get_object('btn_result_token').set_image(image)
+            self.builder.get_object('btn_result_token').set_label(result.token.name)
+        
+            
+    def on_cmb_results_changed(self, combo):
+        self.clear_result_properties()
+        
+        t = combo.get_active()
+        self.result.result_type = t
+        if (t == rpyg_utils.RESULT_ADD_TOKEN or t == rpyg_utils.RESULT_REMOVE_TOKEN):
+            self.builder.get_object('lbl_select_token').set_sensitive(True)
+            self.builder.get_object('btn_result_token').set_sensitive(True)
+        elif (t == rpyg_utils.RESULT_ADD_ITEM or t == rpyg_utils.RESULT_REMOVE_ITEM):
+            self.builder.get_object('lbl_select_item').set_sensitive(True)
+            self.builder.get_object('btn_result_item').set_sensitive(True)
+            
             
             
         
@@ -1086,6 +1222,49 @@ class  RPYG_Designer:
                 self.dialog.conditions.append(self.game.tokens[pos])
                 
                 
+    def on_btn_result_item_clicked(self, button):
+        self.show_window_select(self.liststore_items, self.on_btn_result_item_clicked_ok, self.on_btn_result_item_clicked_cancel)
+        
+    def on_btn_result_item_clicked_cancel(self, button):
+        pass
+    
+    def on_btn_result_item_clicked_ok(self, button):
+        iconview = self.builder.get_object('iconview_select')
+        selected = iconview.get_selected_items()
+        if len(selected)==1:
+            pos = selected[0][0]
+            self.result.item = self.game.items[pos]
+            self.result.token = None
+            #Change button image and text
+            icon  = self.load_image(self.result.item.image_url, 32, 32)
+            image = gtk.image_new_from_pixbuf(icon)
+            self.builder.get_object('btn_result_item').set_image(image)
+            self.builder.get_object('btn_result_item').set_label(self.result.item.name)
+        
+        
+    def on_btn_result_token_clicked(self, button):
+        self.show_window_select(self.liststore_tokens, self.on_btn_result_token_clicked_ok, self.on_btn_result_token_clicked_cancel)
+        
+    def on_btn_result_token_clicked_ok(self, button):
+        iconview = self.builder.get_object('iconview_select')
+        selected = iconview.get_selected_items()
+        if len(selected)==1:
+            pos = selected[0][0]
+            self.result.token = self.game.tokens[pos]
+            self.result.item = None
+            #Change button image and text
+            icon  = self.load_image(os.path.join('images','token.png'), 32, 32)
+            image = gtk.image_new_from_pixbuf(icon)
+            self.builder.get_object('btn_result_token').set_image(image)
+            self.builder.get_object('btn_result_token').set_label(self.result.token.name)
+
+            
+        
+    
+    def on_btn_result_token_clicked_cancel(self, button):
+        pass
+        
+                
 
 #~ 
         #~ - load a pixbuf with the image from a file using
@@ -1099,6 +1278,65 @@ class  RPYG_Designer:
 #~ gtk methods
 #~ - transfer the pixmap to the pixbuf using gtk.gdk.Pixbuf.get_from_drawable()
 #~ - write out the image using gtk.gdk.Pixbuf.save()
+
+
+
+    ####################
+    # Selects window
+    ####################
+    
+    
+    def show_window_select(self, liststore_copy, ok_callback, cancel_callback):
+        iconview = self.builder.get_object('iconview_select')
+        #liststore
+        liststore = iconview.get_model()
+        if (not liststore):
+            # set basic properties
+
+            iconview.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+            iconview.set_item_orientation(gtk.ORIENTATION_VERTICAL)
+
+            # set columns
+            iconview.set_text_column(1)
+            iconview.set_pixbuf_column(0)
+
+            liststore = gtk.ListStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING)
+        else:
+            liststore.clear()
+
+        ignore = True #Ignore the first element
+        for o in liststore_copy:
+            if (ignore):
+                ignore = False
+            else:
+                liststore.append(o)
+
+        iconview.set_model(liststore)
+
+        self.select_window_cancel_callback = cancel_callback
+        self.select_window_ok_callback = ok_callback
+
+        self.builder.get_object('win_select').set_visible(True)
+        
+        
+        
+        
+    
+    
+    def on_btn_select_cancel_clicked(self, button):
+        self.select_window_cancel_callback(button)
+        self.select_window_ok_callback = None
+        self.select_window_cancel_callback = None
+        self.builder.get_object('win_select').set_visible(False)
+
+    def on_btn_select_ok_clicked(self, button):
+        self.select_window_ok_callback(button)
+        self.select_window_ok_callback = None
+        self.select_window_cancel_callback = None
+        self.builder.get_object('win_select').set_visible(False)
+
+
+
 
 
 

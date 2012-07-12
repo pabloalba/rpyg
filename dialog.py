@@ -21,17 +21,20 @@ class Phrase:
 
         
 class Result:
-    #~ RESULT_ADD_TOKEN
-    #~ RESULT_REMOVE_TOKEN
-    #~ RESULT_ADD_ITEM
-    #~ RESULT_REMOVE_ITEM
-    #~ RESULT_MOVE_NPC
-    #~ RESULT_REMOVE_NPC
-    def __init__(self,name,result_type):
+    def __init__(self,name,result_type=0):
+        #result types
+        #~ RESULT_REMOVE_NPC = 0
+        #~ RESULT_ADD_TOKEN = 1 
+        #~ RESULT_REMOVE_TOKEN = 2
+        #~ RESULT_ADD_ITEM = 3
+        #~ RESULT_REMOVE_ITEM = 4
+        #~ RESULT_MOVE_NPC = 5
+        #~ RESULT_END_GAME = 5
+
         self.name=name
         self.result_type=result_type
-        self.item=''
-        self.token=''
+        self.item=None
+        self.token=None
         self.pos=[]
         
     def set_item(self,item):
@@ -69,8 +72,10 @@ class Dialog:
     def remove_condition(self,token):
         self.conditions.remove(token)
         
-    def add_result(self,result):
+    def add_result(self,name):
+        result = Result (name)
         self.results.append(result)
+        return result
     
     def remove_result(self,name):
         for r in self.results:

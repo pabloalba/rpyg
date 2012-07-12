@@ -98,18 +98,18 @@ class Inventory():
         
     def draw(self,screen):
         screen.blit(self.image,(self.posx,self.posy))
-        x=self.posx+50
-        y=self.posy+130
+        x=self.posx+25
+        y=self.posy+30
         item_num=0
         for item in self.items:
             screen.blit(item.image,(x,y))
             
             if self.item_sel==item_num:
                 pygame.draw.rect(screen, (0, 0, 255), (x, y, 75, 75),1)
-                draw_text(screen,item.text, x, y-20, (0, 0, 255))
+                draw_text(screen,item.name, x, y-20, (0, 0, 255))
             if self.item_mark==item_num:
                 pygame.draw.rect(screen, (0, 255, 0), (x, y, 75, 75),1)
-                draw_text(screen,item.text, x, y-20, (0, 255, 0))
+                draw_text(screen,item.name, x, y-20, (0, 0, 0))
             
             x+=100
             if x>=(self.posx+550):

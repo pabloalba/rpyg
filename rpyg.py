@@ -106,25 +106,24 @@ class RPYG:
     def end_dialog(self):
         self.mode=MODE_GAME
         for result in self.dialog.results:
-            print result.name+":"+result.result_type
-            if result.result_type=='RESULT_REMOVE_TOKEN':
+            if result.result_type==RESULT_REMOVE_TOKEN:
                 self.protagonist.remove_token(result.token)
-            elif result.result_type=='RESULT_ADD_TOKEN':
+            elif result.result_type==RESULT_ADD_TOKEN:
                 self.protagonist.add_token(result.token)
-            elif result.result_type=='RESULT_ADD_ITEM':
-                self.protagonist.add_inventory_item_by_name(result.item)
-            elif result.result_type=='RESULT_REMOVE_ITEM':
-                self.protagonist.remove_inventory_item_by_name(result.item)
-            elif result.result_type=='RESULT_REMOVE_NPC':
+            elif result.result_type==RESULT_ADD_ITEM:
+                self.protagonist.add_inventory_item(result.item)
+            elif result.result_type==RESULT_REMOVE_ITEM:
+                self.protagonist.add_inventory_item(result.item)
+            elif result.result_type==RESULT_REMOVE_NPC:
                 if self.mode==MODE_CUT_SCENE:
                     self.mode=MODE_CUT_SCENE_REMOVE
                 else:
                     self.screen.npcs.remove(self.protagonist.npc_interact)
                     self.protagonist.npc_interact=None
-            elif result.result_type=='RESULT_MOVE_NPC':
+            elif result.result_type==RESULT_MOVE_NPC:
                 self.pending_moves.append(result.pos)
                 self.mode=MODE_CUT_SCENE
-            elif result.result_type=='RESULT_END_GAME':
+            elif result.result_type==RESULT_END_GAME:
                 self.mode=MODE_END_GAME
 
 
@@ -145,7 +144,7 @@ class RPYG:
                             self.mode=MODE_TALK
                 if event.key==K_t:
                     for token in self.protagonist.tokens:
-                        print "TOKEN: "+token
+                        print "DEBUG TOKEN: "+token
                 if event.key==K_f:
                     pygame.display.toggle_fullscreen()
 

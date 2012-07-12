@@ -1,6 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
+  <object class="GtkListStore" id="liststore1"/>
+  <object class="GtkListStore" id="liststore_results">
+    <columns>
+      <!-- column-name text -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">NPC disapears</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Add token</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Remove token</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Add item</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">Remove item</col>
+      </row>
+    </data>
+  </object>
   <object class="GtkWindow" id="win_dialogs">
     <property name="width_request">1024</property>
     <property name="height_request">768</property>
@@ -123,6 +147,119 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="border_width">2</property>
+                        <child>
+                          <object class="GtkScrolledWindow" id="scrolledwindow7">
+                            <property name="width_request">220</property>
+                            <property name="height_request">200</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="hscrollbar_policy">never</property>
+                            <property name="shadow_type">in</property>
+                            <child>
+                              <object class="GtkViewport" id="viewport11">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <child>
+                                  <object class="GtkIconView" id="iconview_results">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkFixed" id="result_area">
+                            <property name="width_request">220</property>
+                            <property name="height_request">243</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <child>
+                              <object class="GtkComboBox" id="cmb_results">
+                                <property name="width_request">200</property>
+                                <property name="height_request">30</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="model">liststore_results</property>
+                                <signal name="changed" handler="on_cmb_results_changed" swapped="no"/>
+                              </object>
+                              <packing>
+                                <property name="y">24</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel" id="label32">
+                                <property name="width_request">200</property>
+                                <property name="height_request">30</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="xalign">0</property>
+                                <property name="label" translatable="yes">Select type:</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkLabel" id="lbl_select_token">
+                                <property name="width_request">100</property>
+                                <property name="height_request">20</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="xalign">0</property>
+                                <property name="label" translatable="yes">Select token</property>
+                              </object>
+                              <packing>
+                                <property name="y">69</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkButton" id="btn_result_token">
+                                <property name="use_action_appearance">False</property>
+                                <property name="width_request">200</property>
+                                <property name="height_request">60</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">True</property>
+                                <property name="use_action_appearance">False</property>
+                                <property name="image_position">top</property>
+                                <signal name="clicked" handler="on_btn_result_token_clicked" swapped="no"/>
+                              </object>
+                              <packing>
+                                <property name="y">88</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel" id="lbl_select_item">
+                                <property name="width_request">100</property>
+                                <property name="height_request">20</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="xalign">0</property>
+                                <property name="label" translatable="yes">Select item</property>
+                              </object>
+                              <packing>
+                                <property name="y">153</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkButton" id="btn_result_item">
+                                <property name="use_action_appearance">False</property>
+                                <property name="width_request">200</property>
+                                <property name="height_request">60</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">True</property>
+                                <property name="use_action_appearance">False</property>
+                                <signal name="clicked" handler="on_btn_result_item_clicked" swapped="no"/>
+                              </object>
+                              <packing>
+                                <property name="y">175</property>
+                              </packing>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="y">207</property>
+                          </packing>
+                        </child>
                       </object>
                     </child>
                   </object>
@@ -440,7 +577,7 @@ has the tokens...
             <property name="can_focus">False</property>
           </object>
           <packing>
-            <property name="x">750</property>
+            <property name="x">747</property>
             <property name="y">415</property>
           </packing>
         </child>
@@ -1854,7 +1991,7 @@ on the inventory, and the tokens</property>
       </object>
     </child>
   </object>
-  <object class="GtkWindow" id="win_screens">
+  <object class="GtkWindow" id="win_select">
     <property name="width_request">800</property>
     <property name="height_request">600</property>
     <property name="can_focus">False</property>
@@ -1880,7 +2017,7 @@ on the inventory, and the tokens</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkIconView" id="iconview_destiny">
+                  <object class="GtkIconView" id="iconview_select">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                   </object>
@@ -1890,7 +2027,7 @@ on the inventory, and the tokens</property>
           </object>
         </child>
         <child>
-          <object class="GtkButton" id="btn_destiny_ok">
+          <object class="GtkButton" id="btn_select_ok">
             <property name="label">gtk-ok</property>
             <property name="use_action_appearance">False</property>
             <property name="width_request">100</property>
@@ -1900,7 +2037,7 @@ on the inventory, and the tokens</property>
             <property name="receives_default">True</property>
             <property name="use_action_appearance">False</property>
             <property name="use_stock">True</property>
-            <signal name="clicked" handler="on_btn_destiny_ok_clicked" swapped="no"/>
+            <signal name="clicked" handler="on_btn_select_ok_clicked" swapped="no"/>
           </object>
           <packing>
             <property name="x">450</property>
@@ -1908,7 +2045,7 @@ on the inventory, and the tokens</property>
           </packing>
         </child>
         <child>
-          <object class="GtkButton" id="btn_destiny_cancel">
+          <object class="GtkButton" id="btn_select_cancel">
             <property name="label">gtk-cancel</property>
             <property name="use_action_appearance">False</property>
             <property name="width_request">100</property>
@@ -1918,7 +2055,7 @@ on the inventory, and the tokens</property>
             <property name="receives_default">True</property>
             <property name="use_action_appearance">False</property>
             <property name="use_stock">True</property>
-            <signal name="clicked" handler="on_btn_destiny_cancel_clicked" swapped="no"/>
+            <signal name="clicked" handler="on_btn_select_cancel_clicked" swapped="no"/>
           </object>
           <packing>
             <property name="x">250</property>
