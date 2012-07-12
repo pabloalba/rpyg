@@ -164,6 +164,12 @@ class  RPYG_Designer:
         image = gtk.image_new_from_pixbuf(icon)
         self.builder.get_object('btn_add_dialog_npc').set_image(image)
         
+        icon  = self.load_image(os.path.join('images','add_token.png'), 32)
+        image = gtk.image_new_from_pixbuf(icon)
+        self.builder.get_object('btn_add_token').set_image(image)
+        
+        
+        
         self.builder.get_object('box_conditions').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color('#606060'))
         self.builder.get_object('box_dialog').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color('#606060'))
         self.builder.get_object('box_results').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color('#606060'))        
@@ -517,23 +523,28 @@ class  RPYG_Designer:
                 self.s_exit = self.screen.exits[pos-1]
                 self.load_exit_properties(self.s_exit)
                 
+    def create_token(self):
+        name = "token "+str(len(self.game.tokens)+1)
+        token = self.game.add_token(name)
+        
+        #add token icon
+        pixbuf = self.load_image(os.path.join("images","token.png"), 32, 32)
+        liststore_item = [pixbuf, name]
+        self.liststore_tokens.append(liststore_item)
+        return liststore_item
+        
+                
     def on_icon_token_clicked(self, iconview):
         selected = iconview.get_selected_items()
         if (len(selected) == 1):
             pos = selected[0][0]
             #if it is the first icon, add token
             if (pos == 0):
-                name = "token "+str(len(self.game.tokens)+1)
-                token = self.game.add_token(name)
-                
-                #add token icon
-                pixbuf = self.load_image(os.path.join("images","token.png"), 32, 32)
-                self.liststore_tokens.append([pixbuf, name])
+                self.token = token
                 #Select last element
                 pos = len(self.game.tokens)
                 self.builder.get_object('iconview_tokens').select_path((pos,))
                 self.load_token_properties(token)
-                self.token = token
 
             else:
                 self.token = self.game.tokens[pos-1]
@@ -1264,6 +1275,10 @@ class  RPYG_Designer:
     def on_btn_result_token_clicked_cancel(self, button):
         pass
         
+        
+    def on_btn_add_token_clicked(self, button):
+        liststore_item = self.create_token()
+        self.builder.get_object('iconview_conditions').get_model().append(liststore_item)
                 
 
 #~ 

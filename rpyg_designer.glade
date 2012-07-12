@@ -443,6 +443,7 @@
                         <property name="border_width">2</property>
                         <child>
                           <object class="GtkLabel" id="label30">
+                            <property name="width_request">193</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">If the protagonist
@@ -453,14 +454,14 @@ has the tokens...
                             </attributes>
                           </object>
                           <packing>
-                            <property name="x">32</property>
-                            <property name="y">19</property>
+                            <property name="x">15</property>
+                            <property name="y">6</property>
                           </packing>
                         </child>
                         <child>
                           <object class="GtkScrolledWindow" id="scrolledwindow6">
                             <property name="width_request">160</property>
-                            <property name="height_request">370</property>
+                            <property name="height_request">330</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="hscrollbar_policy">never</property>
@@ -481,7 +482,7 @@ has the tokens...
                           </object>
                           <packing>
                             <property name="x">25</property>
-                            <property name="y">70</property>
+                            <property name="y">54</property>
                           </packing>
                         </child>
                         <child>
@@ -496,6 +497,23 @@ has the tokens...
                           <packing>
                             <property name="x">61</property>
                             <property name="y">451</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="btn_add_token">
+                            <property name="label" translatable="yes">Add new token</property>
+                            <property name="use_action_appearance">False</property>
+                            <property name="width_request">160</property>
+                            <property name="height_request">40</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                            <property name="use_action_appearance">False</property>
+                            <signal name="clicked" handler="on_btn_add_token_clicked" swapped="no"/>
+                          </object>
+                          <packing>
+                            <property name="x">26</property>
+                            <property name="y">393</property>
                           </packing>
                         </child>
                       </object>
