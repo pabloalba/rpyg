@@ -56,6 +56,7 @@ class Dialog:
     def add_phrase(self,text,by_npc):
         phrase=Phrase(self,text,by_npc)
         self.phrases.append(phrase)
+        return phrase
         
     def remove_phrase(self,text):
         for p in self.phrases:

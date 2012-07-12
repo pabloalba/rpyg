@@ -98,6 +98,7 @@ class NPC(Actor):
     def add_dialog(self,name):
         dialog=Dialog(self,name)
         self.dialogs.append(dialog)
+        return dialog
 
     def remove_dialog(self, dialog):
         self.dialogs.remove(dialog)

@@ -99,7 +99,7 @@ class MapScreen(gtk.DrawingArea):
 
 
 class  RPYG_Designer:
-    def __init__(self):
+    def __init__(self, game_file):
 
         filename = "rpyg_designer.glade"
         self.builder = gtk.Builder()
@@ -109,13 +109,6 @@ class  RPYG_Designer:
         self.game_filename=''
 
         self.win_rpyg=self.builder.get_object('win_rpyg')
-
-
-        
-
-        #~ self.item=None
-
-        #~ self.dialog=None
 
         self.win_rpyg.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("lightgray"))
 
@@ -140,6 +133,9 @@ class  RPYG_Designer:
         self.builder.get_object('other_properties').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color("#D3D3D3"))
         self.builder.get_object('viewport2').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color("#D3D3D3"))
 
+
+
+        #Init dialogs window
         icon  = self.load_image(os.path.join('images','pos_map.png'), 16, 16)
         image = gtk.image_new_from_pixbuf(icon)
         self.builder.get_object('btn_prot_map').set_image(image)
@@ -150,13 +146,33 @@ class  RPYG_Designer:
         image = gtk.image_new_from_pixbuf(icon)
         self.builder.get_object('btn_destiny_map').set_image(image)
 
-        icon  = self.load_image(os.path.join('images','dialogs.png'), 90)
+        icon  = self.load_image(os.path.join('images','dialog.png'), 90)
         image = gtk.image_new_from_pixbuf(icon)
         self.builder.get_object('btn_npc_dialogs').set_image(image)
 
         icon  = self.load_image(os.path.join('images','help.png'), 25)
         self.builder.get_object('help_1').set_from_pixbuf(icon)
         self.builder.get_object('help_2').set_from_pixbuf(icon)
+        
+        icon  = self.load_image(os.path.join('images','arrow.png'))
+        self.builder.get_object('img_arrow_1').set_from_pixbuf(icon)
+        self.builder.get_object('img_arrow_2').set_from_pixbuf(icon)
+        
+        
+        icon  = self.load_image(os.path.join('images','add_dialog_prot.png'), 90)
+        image = gtk.image_new_from_pixbuf(icon)
+        self.builder.get_object('btn_add_dialog_prot').set_image(image)
+        
+        icon  = self.load_image(os.path.join('images','add_dialog_npc.png'), 90)
+        image = gtk.image_new_from_pixbuf(icon)
+        self.builder.get_object('btn_add_dialog_npc').set_image(image)
+        
+        self.builder.get_object('box_conditions').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color('#606060'))
+        self.builder.get_object('box_dialog').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color('#606060'))
+        self.builder.get_object('box_results').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color('#606060'))
+        
+        self.builder.get_object('win_dialogs').set_visible(False)
+        
 
 
         self.liststore_maps = None
@@ -164,17 +180,26 @@ class  RPYG_Designer:
         self.liststore_exits = None
         self.liststore_tokens = None
         self.liststore_items = None
+        self.liststore_dialogs = None
+        self.liststore_phrase = None
         
         self.screen = None
         self.npc = None
         self.s_exit = None
         self.token = None
         self.item = None
+        self.dialog = None
+        self.phrase = None
         
         self.game = Game()
         self.init_iconview_maps()
         self.init_iconview_tokens()
         self.init_iconview_items()
+        self.init_iconview_dialogs()
+        
+        if (game_file):
+            self.open_game_file(game_file)
+        
 
     def init_iconview_maps(self):
         # set basic properties
@@ -240,6 +265,7 @@ class  RPYG_Designer:
 
         self.win_rpyg.show_all()
         
+        
     def init_iconview_items(self):
         # set basic properties
         iconview = self.builder.get_object('iconview_items')
@@ -271,6 +297,66 @@ class  RPYG_Designer:
         iconview.connect('selection_changed', self.on_icon_item_clicked)
 
         self.win_rpyg.show_all()
+        
+        
+    def init_iconview_dialogs(self):
+        # set basic properties
+        iconview = self.builder.get_object('iconview_dialogs')
+        iconview.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+        iconview.set_item_orientation(gtk.ORIENTATION_VERTICAL)
+
+        # set columns
+        iconview.set_text_column(1)
+        iconview.set_pixbuf_column(0)
+
+
+        # set liststore
+        if (self.liststore_dialogs):
+            liststore = self.liststore_dialogs
+            liststore.clear()
+        else:
+            liststore = gtk.ListStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING)
+
+
+        #Add icon for 'add dialog'
+        add_icon = self.load_image("images/add_dialog.png", 32, 32)
+        liststore.append([add_icon, "Add dialog"])
+
+        #set liststore
+        iconview.set_model(liststore)
+        self.liststore_dialogs = liststore
+
+        #assign event
+        iconview.connect('selection_changed', self.on_icon_dialog_clicked)
+
+        self.builder.get_object('win_dialogs').show_all()
+        
+    def init_iconview_phrase(self):
+        # set basic properties
+        iconview = self.builder.get_object('iconview_phrase')
+        iconview.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+        iconview.set_item_orientation(gtk.ORIENTATION_VERTICAL)
+
+        # set columns
+        iconview.set_text_column(1)
+        iconview.set_pixbuf_column(0)
+
+
+        # set liststore
+        if (self.liststore_phrase):
+            liststore = self.liststore_phrase
+            liststore.clear()
+        else:
+            liststore = gtk.ListStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING)
+
+
+        #set liststore
+        iconview.set_model(liststore)
+        self.liststore_phrase = liststore
+
+        self.builder.get_object('win_dialogs').show_all()
+        
+        
 
     def init_iconview_npcs(self):
         # set basic properties
@@ -414,6 +500,27 @@ class  RPYG_Designer:
                 self.item = self.game.items[pos-1]
                 self.load_item_properties(self.item)
                 
+    def on_icon_dialog_clicked(self, iconview):
+        selected = iconview.get_selected_items()
+        if (len(selected) == 1):
+            pos = selected[0][0]
+            #if it is the first icon, add dialog
+            if (pos == 0):
+                name = "dialog "+str(len(self.npc.dialogs)+1)
+                dialog = self.npc.add_dialog(name)
+                
+                #add dialog icon
+                pixbuf = self.load_image(os.path.join("images","dialog.png"), 32, 32)
+                self.liststore_dialogs.append([pixbuf, name])
+                #Select last element
+                pos = len(self.npc.dialogs)
+                self.builder.get_object('iconview_dialogs').select_path((pos,))
+                self.load_dialog_properties(dialog)
+                self.dialog = dialog
+
+            else:
+                self.dialog = self.npc.dialogs[pos-1]
+                self.load_dialog_properties(self.dialog)
 
 
     def on_exit_keep_toggled(self, button):
@@ -557,6 +664,17 @@ class  RPYG_Designer:
             for t in self.game.tokens:
                 pixbuf = self.load_image(os.path.join("images","token.png"), 32, 32)
                 self.liststore_tokens.append([pixbuf, t.name])
+                
+    def load_dialogs(self):
+        self.init_iconview_dialogs()
+        self.builder.get_object('dialog_name').set_text('')
+        self.builder.get_object('dialog_area').set_sensitive(False)
+        if (len(self.npc.dialogs) != 0 ):
+            #Load dialogs
+            i = 0
+            for d in self.npc.dialogs:
+                pixbuf = self.load_image(os.path.join("images","dialog.png"), 32, 32)
+                self.liststore_dialogs.append([pixbuf, d.name])
 
     def load_items(self):
         self.init_iconview_items()
@@ -609,6 +727,17 @@ class  RPYG_Designer:
         self.builder.get_object('item_area').set_sensitive(True)
         #Write token properties
         self.builder.get_object('item_name').set_text(item.name)
+        
+    def load_dialog_properties(self, dialog):
+        self.builder.get_object('dialog_area').set_sensitive(True)
+        #Write dialog properties
+        self.builder.get_object('dialog_name').set_text(dialog.name)
+        self.init_iconview_phrase()
+        
+        #Load dialogs
+        
+        
+        
 
     def load_prot(self):
         name = self.screen.protagonist.name
@@ -828,6 +957,51 @@ class  RPYG_Designer:
             return pos
 
 
+    ##########################
+    # Dialogs
+    ##########################
+    
+    def on_btn_npc_dialogs_clicked(self, button):
+        pixbuf = gtk.gdk.pixbuf_new_from_file(self.npc.img_file)
+        subpixbuf = pixbuf.subpixbuf(0, 0, 32, 48)
+        self.builder.get_object('img_dialog_npc_chara').set_from_pixbuf(subpixbuf)
+            
+        pixbuf = gtk.gdk.pixbuf_new_from_file(self.screen.protagonist.img_file)
+        subpixbuf = pixbuf.subpixbuf(0, 0, 32, 48)
+        self.builder.get_object('img_dialog_prot_chara').set_from_pixbuf(subpixbuf)
+        
+        pixbuf = gtk.gdk.pixbuf_new_from_file(self.screen.protagonist.img_dialog)
+        self.builder.get_object('img_dialog_prot').set_from_pixbuf(pixbuf)
+        
+        pixbuf = gtk.gdk.pixbuf_new_from_file(self.npc.img_dialog)
+        self.builder.get_object('img_dialog_npc').set_from_pixbuf(pixbuf)
+        
+        self.builder.get_object('lbl_dialogs_with').set_text('Dialogs with '+self.npc.name)
+        
+        self.load_dialogs()
+        
+        
+        self.builder.get_object('win_dialogs').set_visible(True)
+    
+    def on_btn_dialog_ok_clicked(self, button):
+        self.builder.get_object('win_dialogs').set_visible(False)
+
+
+    def on_btn_add_dialog_prot_activate(self, button):
+        self.phrase = self.dialog.add_phrase('',False)
+        #add icon
+        pixbuf = self.load_image(os.path.join("images","dialog_prot.png"))
+        self.liststore_phrase.append([pixbuf, ''])
+        #Select last element
+        pos = len(self.dialog.phrases)
+        self.builder.get_object('iconview_phrase').select_path((pos,))
+        #self.load_phrase_properties(self.phrase)
+        
+        
+    
+    def on_btn_add_dialog_npc_clicked(self, button):
+        pass
+
 
 
     ##########################
@@ -863,6 +1037,8 @@ class  RPYG_Designer:
         self.s_exit = None
         self.token = None
         self.item = None
+        self.dialog = None
+        self.phrase = None
 
 
 
@@ -871,21 +1047,24 @@ class  RPYG_Designer:
         self.clear_current()
         filename = self.open_file('*.rpyg')
         if (filename):
-            self.game_filename = filename
-            game = rpyg_utils.open_game(filename)
-            if (game):
-                self.game = game[0]
-                tempDir = game[1]
+            self.open_game_file(filename)
+            
+    def open_game_file(self, filename):
+        self.game_filename = filename
+        game = rpyg_utils.open_game(filename)
+        if (game):
+            self.game = game[0]
+            tempDir = game[1]
 
-                self.load_screens()
-                self.load_tokens()
-                self.load_items()
+            self.load_screens()
+            self.load_tokens()
+            self.load_items()
 
-                self.win_rpyg.set_title("RPyG Designer: "+str(os.path.basename(filename)))
-                self.builder.get_object('main_area').set_sensitive(True)
-            else:
-                self.builder.get_object('main_area').set_sensitive(False)
-                self.show_error("Error on load file")
+            self.win_rpyg.set_title("RPyG Designer: "+str(os.path.basename(filename)))
+            self.builder.get_object('main_area').set_sensitive(True)
+        else:
+            self.builder.get_object('main_area').set_sensitive(False)
+            self.show_error("Error on load file")
 
     def load_screens(self):
         for screen in self.game.screens:
@@ -1043,6 +1222,15 @@ class  RPYG_Designer:
                 pos = selected[0][0]
                 self.liststore_items[pos][1]=name
                 
+    def on_dialog_name_changed(self, field):
+        name = field.get_text()
+        if (name):                        
+            selected = self.builder.get_object('iconview_dialogs').get_selected_items()
+            if (len(selected) == 1):
+                self.dialog.name = name
+                pos = selected[0][0]
+                self.liststore_dialogs[pos][1]=name
+                
 
     def screen_music_select(self, button):
         filename = self.open_file ("*.ogg *.mp3")
@@ -1144,7 +1332,9 @@ class  RPYG_Designer:
         print "self.screen.protagonist.max_cols: "+str(self.screen.protagonist.max_cols)
 
 
+game_file = None
+if len(sys.argv)>1:
+    game_file=sys.argv[1]
 
-
-app = RPYG_Designer()
+app = RPYG_Designer(game_file)
 gtk.main()
