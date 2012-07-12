@@ -111,8 +111,7 @@ class  RPYG_Designer:
         self.win_rpyg=self.builder.get_object('win_rpyg')
 
 
-        self.npc = None
-        self.s_exit = None
+        
 
         #~ self.item=None
 
@@ -163,9 +162,16 @@ class  RPYG_Designer:
         self.liststore_maps = None
         self.liststore_npcs = None
         self.liststore_exits = None
+        self.liststore_tokens = None
+        
         self.screen = None
+        self.npc = None
+        self.s_exit = None
+        self.token = None
+        
         self.game = Game()
         self.init_iconview_maps()
+        self.init_iconview_tokens()
 
     def init_iconview_maps(self):
         # set basic properties
@@ -196,6 +202,38 @@ class  RPYG_Designer:
 
         #assign event
         iconview.connect('selection_changed', self.on_icon_map_clicked)
+
+        self.win_rpyg.show_all()
+        
+    def init_iconview_tokens(self):
+        # set basic properties
+        iconview = self.builder.get_object('iconview_tokens')
+        iconview.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+        iconview.set_item_orientation(gtk.ORIENTATION_VERTICAL)
+
+        # set columns
+        iconview.set_text_column(1)
+        iconview.set_pixbuf_column(0)
+
+
+        # set liststore
+        if (self.liststore_tokens):
+            liststore = self.liststore_tokens
+            liststore.clear()
+        else:
+            liststore = gtk.ListStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING)
+
+
+        #Add icon for 'add token'
+        add_icon = self.load_image("images/add_token.png", 32, 32)
+        liststore.append([add_icon, "Add token"])
+
+        #set liststore
+        iconview.set_model(liststore)
+        self.liststore_tokens = liststore
+
+        #assign event
+        iconview.connect('selection_changed', self.on_icon_token_clicked)
 
         self.win_rpyg.show_all()
 
@@ -304,10 +342,30 @@ class  RPYG_Designer:
                 self.builder.get_object('iconview_exits').select_path((pos,))
                 self.load_exit_properties(self.s_exit)
 
-                self.builder.get_object('exit_area').set_sensitive(True)
             else:
                 self.s_exit = self.screen.exits[pos-1]
                 self.load_exit_properties(self.s_exit)
+                
+    def on_icon_token_clicked(self, iconview):
+        selected = iconview.get_selected_items()
+        if (len(selected) == 1):
+            pos = selected[0][0]
+            #if it is the first icon, add token
+            if (pos == 0):
+                name = "token "+str(len(self.game.tokens)+1)
+                self.game.add_token(name)
+                
+                #add token icon
+                pixbuf = self.load_image(os.path.join("images","token.png"), 32, 32)
+                self.liststore_tokens.append([pixbuf, name])
+                #Select last element
+                pos = len(self.game.tokens)
+                self.builder.get_object('iconview_tokens').select_path((pos,))
+                self.load_token_properties(name)
+
+            else:
+                self.token = self.game.tokens[pos-1]
+                self.load_token_properties(self.token)
 
 
     def on_exit_keep_toggled(self, button):
@@ -386,16 +444,14 @@ class  RPYG_Designer:
 
     def load_exits(self):
         self.init_iconview_exits()
+        self.builder.get_object('exit_name').set_text('')
+        self.builder.get_object('exit_x').set_text('')
+        self.builder.get_object('exit_y').set_text('')
+        self.builder.get_object('destiny_name').set_text('')
+        self.builder.get_object('destiny_x').set_text('')
+        self.builder.get_object('destiny_y').set_text('')
         self.builder.get_object('exit_area').set_sensitive(False)
-        if (len(self.screen.exits) == 0 ):
-            self.builder.get_object('exit_name').set_text('')
-            self.builder.get_object('exit_x').set_text('')
-            self.builder.get_object('exit_y').set_text('')
-            self.builder.get_object('destiny_name').set_text('')
-            self.builder.get_object('destiny_x').set_text('')
-            self.builder.get_object('destiny_y').set_text('')
-
-        else:
+        if (len(self.screen.exits) != 0 ):
             #Load exits
             i = 0
             for e in self.screen.exits:
@@ -405,18 +461,27 @@ class  RPYG_Designer:
 
     def load_npcs(self):
         self.builder.get_object('npc_area').set_sensitive(False)
+        self.builder.get_object('npc_name').set_text('')
+        self.builder.get_object('npc_x').set_text('')
+        self.builder.get_object('npc_y').set_text('')
         self.init_iconview_npcs()
-        if (len(self.screen.npcs) == 0 ):
-            self.builder.get_object('npc_name').set_text('')
-            self.builder.get_object('npc_x').set_text('')
-            self.builder.get_object('npc_y').set_text('')
-        else:
+        if (len(self.screen.npcs) != 0 ):
             #Load npcs
             i = 0
             for npc in self.screen.npcs:
                 self.add_npc_icon(npc)
 
 
+    def load_tokens(self):
+        self.init_iconview_tokens()
+        self.builder.get_object('token_name').set_text('')
+        self.builder.get_object('token_area').set_sensitive(False)
+        if (len(self.game.tokens) != 0 ):
+            #Load tokens
+            i = 0
+            for t in self.game.tokens:
+                pixbuf = self.load_image(os.path.join("images","token.png"), 32, 32)
+                self.liststore_tokens.append([pixbuf, t.name])
 
 
     def add_npc_icon(self, npc):
@@ -448,6 +513,11 @@ class  RPYG_Designer:
         self.builder.get_object('destiny_x').set_text(str(s_exit.spawn_pos[0]))
         self.builder.get_object('destiny_y').set_text(str(s_exit.spawn_pos[1]))
 
+
+    def load_token_properties(self, token):
+        self.builder.get_object('token_area').set_sensitive(True)
+        #Write token properties
+        self.builder.get_object('token_name').set_text(token.name)
 
     def load_prot(self):
         name = self.screen.protagonist.name
@@ -696,6 +766,11 @@ class  RPYG_Designer:
 
         self.builder.get_object('screen_box').set_sensitive(False)
         self.builder.get_object('screen_properties').set_sensitive(False)
+        
+        self.screen = None
+        self.npc = None
+        self.s_exit = None
+        self.token = None
 
 
 
@@ -711,7 +786,7 @@ class  RPYG_Designer:
                 tempDir = game[1]
 
                 self.load_screens()
-                #~ self.load_tokens()
+                self.load_tokens()
                 #~ self.load_items()
 
                 self.win_rpyg.set_title("RPyG Designer: "+str(os.path.basename(filename)))
@@ -829,7 +904,7 @@ class  RPYG_Designer:
 
 
 
-    def screen_name_change(self, field, event):
+    def screen_name_change(self, field):
         if (field.get_text()):
             self.screen.name = field.get_text()
             selected = self.builder.get_object('iconview_maps').get_selected_items()
@@ -838,25 +913,36 @@ class  RPYG_Designer:
                 self.liststore_maps[pos][1]=self.screen.name
 
 
-    def prot_name_change(self, field, event):
+    def prot_name_change(self, field):
         if (field.get_text()):
             self.screen.protagonist.name = field.get_text()
 
-    def npc_name_change(self, field, event):
-        if (field.get_text()):
-            self.npc.name = field.get_text()
+    def npc_name_change(self, field):
+        if (field.get_text()):            
             selected = self.builder.get_object('iconview_npcs').get_selected_items()
             if (len(selected) == 1):
+                self.npc.name = field.get_text()
                 pos = selected[0][0]
                 self.liststore_npcs[pos][1]=self.npc.name
 
-    def exit_name_change(self, field, event):
-        if (field.get_text()):
-            self.s_exit.name = field.get_text()
+    def exit_name_change(self, field):
+        if (field.get_text()):            
             selected = self.builder.get_object('iconview_exits').get_selected_items()
             if (len(selected) == 1):
+                self.s_exit.name = field.get_text()
                 pos = selected[0][0]
                 self.liststore_exits[pos][1]=self.s_exit.name
+                
+    def on_token_name_changed(self, field):
+        name = field.get_text()
+        if (name):                        
+            selected = self.builder.get_object('iconview_tokens').get_selected_items()
+            if (len(selected) == 1):
+                self.token.name = name
+                pos = selected[0][0]
+                self.liststore_tokens[pos][1]=name
+                
+                
 
     def screen_music_select(self, button):
         filename = self.open_file ("*.ogg *.mp3")

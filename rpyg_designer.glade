@@ -324,7 +324,7 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="invisible_char">•</property>
-                                <signal name="focus-out-event" handler="screen_name_change" swapped="no"/>
+                                <signal name="changed" handler="screen_name_change" swapped="no"/>
                               </object>
                               <packing>
                                 <property name="x">10</property>
@@ -443,7 +443,7 @@ Right button inverts selection.</property>
                                                 <property name="visible">True</property>
                                                 <property name="can_focus">True</property>
                                                 <property name="invisible_char">•</property>
-                                                <signal name="focus-out-event" handler="prot_name_change" swapped="no"/>
+                                                <signal name="changed" handler="prot_name_change" swapped="no"/>
                                               </object>
                                               <packing>
                                                 <property name="x">25</property>
@@ -684,7 +684,7 @@ Right button inverts selection.</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="invisible_char">•</property>
                                                     <property name="invisible_char_set">True</property>
-                                                    <signal name="focus-out-event" handler="npc_name_change" swapped="no"/>
+                                                    <signal name="changed" handler="npc_name_change" swapped="no"/>
                                                   </object>
                                                   <packing>
                                                     <property name="x">25</property>
@@ -928,7 +928,7 @@ Right button inverts selection.</property>
                                                     <property name="can_focus">True</property>
                                                     <property name="invisible_char">•</property>
                                                     <property name="invisible_char_set">True</property>
-                                                    <signal name="focus-out-event" handler="exit_name_change" swapped="no"/>
+                                                    <signal name="changed" handler="exit_name_change" swapped="no"/>
                                                   </object>
                                                   <packing>
                                                     <property name="x">25</property>
@@ -1268,6 +1268,64 @@ on the inventory, and the tokens</property>
               <object class="GtkFixed" id="fixed4">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <child>
+                  <object class="GtkScrolledWindow" id="tokens_scroll">
+                    <property name="width_request">1024</property>
+                    <property name="height_request">500</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="hscrollbar_policy">never</property>
+                    <property name="shadow_type">in</property>
+                    <child>
+                      <object class="GtkViewport" id="viewport6">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <child>
+                          <object class="GtkIconView" id="iconview_tokens">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkFixed" id="token_area">
+                    <property name="width_request">1000</property>
+                    <property name="height_request">80</property>
+                    <property name="visible">True</property>
+                    <property name="sensitive">False</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkLabel" id="label25">
+                        <property name="height_request">20</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Name:</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkEntry" id="token_name">
+                        <property name="width_request">200</property>
+                        <property name="height_request">20</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="invisible_char">•</property>
+                        <property name="invisible_char_set">True</property>
+                        <signal name="changed" handler="on_token_name_changed" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="y">30</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="x">15</property>
+                    <property name="y">510</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="position">2</property>

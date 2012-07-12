@@ -134,7 +134,9 @@ class Game:
         return None
 
     def add_token(self,name):
-        self.tokens.append(name)
+        token = Token(name, self)
+        self.tokens.append(token)
+        return token
 
     def remove_token(self,name):
         self.tokens.remove(name)

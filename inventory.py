@@ -119,7 +119,12 @@ class Inventory():
             if (item.id==id):
                 return item
         return None
-                        
+            
+            
+class Token():
+    def __init__(self, name, game):
+        self.name=name
+        self.game=game
             
 # ---------------------------------------------------------------------
  
