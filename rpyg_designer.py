@@ -72,9 +72,6 @@ class MapScreen(gtk.DrawingArea):
             cr.fill()
 
 
-
-
-
         #mark
         if (self.mark_x > -1) and (self.mark_y > -1):
             cr.set_source_rgba(1, 1, 0, 0.5)
@@ -181,6 +178,8 @@ class  RPYG_Designer:
         self.liststore_items = None
         self.liststore_dialogs = None
         self.liststore_phrase = None
+        
+        self.conditions_handler = None
         
         self.screen = None
         self.npc = None
@@ -501,7 +500,7 @@ class  RPYG_Designer:
                 self.item = self.game.items[pos-1]
                 self.load_item_properties(self.item)
                 
-    def on_icon_dialog_clicked(self, iconview):
+    def on_icon_dialog_clicked(self, iconview):        
         selected = iconview.get_selected_items()
         if (len(selected) == 1):
             pos = selected[0][0]
@@ -515,11 +514,11 @@ class  RPYG_Designer:
                 self.liststore_dialogs.append([pixbuf, name])
                 #Select last element
                 pos = len(self.npc.dialogs)
-                self.builder.get_object('iconview_dialogs').select_path((pos,))
-                self.load_dialog_properties(dialog)
+                self.builder.get_object('iconview_dialogs').select_path((pos,))                
                 self.dialog = dialog
+                self.load_dialog_properties(self.dialog)
 
-            else:
+            else:                
                 self.dialog = self.npc.dialogs[pos-1]
                 self.load_dialog_properties(self.dialog)
 
@@ -668,6 +667,7 @@ class  RPYG_Designer:
                 
     def load_dialogs(self):
         self.init_iconview_dialogs()
+        self.init_iconview_conditions()
         self.builder.get_object('dialog_name').set_text('')
         self.builder.get_object('dialog_area').set_sensitive(False)
         if (len(self.npc.dialogs) != 0 ):
@@ -729,13 +729,7 @@ class  RPYG_Designer:
         #Write token properties
         self.builder.get_object('item_name').set_text(item.name)
         
-    def load_dialog_properties(self, dialog):
-        self.builder.get_object('dialog_area').set_sensitive(True)
-        #Write dialog properties
-        self.builder.get_object('dialog_name').set_text(dialog.name)
-        self.init_iconview_phrase()
-        
-        #Load dialogs
+   
         
         
         
@@ -989,25 +983,27 @@ class  RPYG_Designer:
 
 
     def on_btn_add_dialog_prot_activate(self, button):
+        self.phrase = self.dialog.add_phrase('',False)
         self.dialog_add_phrase(False)
     
     def on_btn_add_dialog_npc_clicked(self, button):
+        self.phrase = self.dialog.add_phrase('',True)
         self.dialog_add_phrase(True)
         
-    def dialog_add_phrase(self, isNPC):
-        self.phrase = self.dialog.add_phrase('',isNPC)
+    def dialog_add_phrase(self, by_npc, text='', select_phrase=True):
         #add icon
-        if (isNPC):
+        if (by_npc):
             pixbuf = self.load_image(os.path.join("images","dialog_npc.png"))
         else:
             pixbuf = self.load_image(os.path.join("images","dialog_prot.png"))
             
-        self.liststore_phrase.append([pixbuf, ''])
+        self.liststore_phrase.append([pixbuf, text])
         
-        #Select last element
-        pos = len(self.dialog.phrases)
-        self.builder.get_object('iconview_phrase').select_path((pos-1,))
-        self.load_phrase_properties(self.phrase)
+        if select_phrase:
+            #Select last element
+            pos = len(self.dialog.phrases)
+            self.builder.get_object('iconview_phrase').select_path((pos-1,))
+            self.load_phrase_properties(self.phrase)
         
     def load_phrase_properties(self, phrase):
         self.builder.get_object('phrase').set_text(phrase.text)
@@ -1028,6 +1024,67 @@ class  RPYG_Designer:
                 self.liststore_phrase[pos][1]=self.phrase.text
                 
 
+    def load_dialog_properties(self, dialog):
+        
+        self.builder.get_object('iconview_conditions').handler_block(self.conditions_handler)
+        self.builder.get_object('dialog_area').set_sensitive(True)
+        #Write dialog properties
+        self.builder.get_object('dialog_name').set_text(dialog.name)
+        self.init_iconview_phrase()
+        self.init_iconview_conditions()
+                
+        #Load phrases
+        for p in dialog.phrases:
+            self.dialog_add_phrase(p.by_npc, p.text, False)
+            
+        #load conditions
+        pos = 0
+        for token in self.game.tokens:
+            if token in dialog.conditions:
+                self.builder.get_object('iconview_conditions').select_path((pos,))
+                
+        self.builder.get_object('iconview_conditions').handler_unblock(self.conditions_handler)
+            
+            
+        
+        
+    def init_iconview_conditions(self):
+        #liststore
+        iconview = self.builder.get_object('iconview_conditions')
+        liststore = iconview.get_model()
+        if (not liststore):
+            # set basic properties
+            iconview.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+            iconview.set_item_orientation(gtk.ORIENTATION_VERTICAL)
+
+            # set columns
+            iconview.set_text_column(1)
+            iconview.set_pixbuf_column(0)
+
+            liststore = gtk.ListStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING)
+            
+            self.conditions_handler = iconview.connect('selection_changed', self.on_icon_conditions_clicked)
+            
+        else:
+            liststore.clear()
+
+        ignore = True #Ignore the first element
+        for o in self.liststore_tokens:
+            if (ignore):
+                ignore = False
+            else:
+                liststore.append(o)
+
+        iconview.set_model(liststore)
+        
+    def on_icon_conditions_clicked(self, iconview):        
+        selected = iconview.get_selected_items()
+        self.dialog.conditions = []
+        if (len(selected) > 0):
+            for s in selected:                
+                pos = s[0]
+                self.dialog.conditions.append(self.game.tokens[pos])
+                
 
 #~ 
         #~ - load a pixbuf with the image from a file using

@@ -304,6 +304,63 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="border_width">2</property>
+                        <child>
+                          <object class="GtkLabel" id="label30">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="label" translatable="yes">If the protagonist
+has the tokens...
+</property>
+                            <attributes>
+                              <attribute name="font-desc" value="Sans 12"/>
+                            </attributes>
+                          </object>
+                          <packing>
+                            <property name="x">32</property>
+                            <property name="y">19</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkScrolledWindow" id="scrolledwindow6">
+                            <property name="width_request">160</property>
+                            <property name="height_request">370</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="hscrollbar_policy">never</property>
+                            <property name="shadow_type">in</property>
+                            <child>
+                              <object class="GtkViewport" id="viewport10">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <child>
+                                  <object class="GtkIconView" id="iconview_conditions">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="selection_mode">multiple</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="x">25</property>
+                            <property name="y">70</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="label31">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="label" translatable="yes">then...</property>
+                            <attributes>
+                              <attribute name="font-desc" value="Sans 12"/>
+                            </attributes>
+                          </object>
+                          <packing>
+                            <property name="x">61</property>
+                            <property name="y">451</property>
+                          </packing>
+                        </child>
                       </object>
                     </child>
                   </object>
