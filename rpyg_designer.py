@@ -1233,7 +1233,7 @@ class  RPYG_Designer:
         subpixbuf = pixbuf.subpixbuf(0, 0, 32, 48)
         self.builder.get_object('img_dialog_prot_chara').set_from_pixbuf(subpixbuf)
         
-        pixbuf = self.load_image(self.screen.protagonist.img_file, 90)
+        pixbuf = self.load_image(self.screen.protagonist.img_dialog, 90)
         self.builder.get_object('img_dialog_prot').set_from_pixbuf(pixbuf)
         
         pixbuf = self.load_image(self.npc.img_dialog, 90)

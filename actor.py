@@ -200,6 +200,9 @@ class Protagonist(Actor):
     def remove_inventory_item_by_name(self,name):
         item=self.screen.game.get_item(name)
         self.inventory.remove_item(item)
+        
+    def remove_inventory_item(self, item):
+        self.inventory.remove_item(item)
 
     def add_token(self,token):
         if not token in self.tokens:

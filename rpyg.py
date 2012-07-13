@@ -113,7 +113,7 @@ class RPYG:
             elif result.result_type==RESULT_ADD_ITEM:
                 self.protagonist.add_inventory_item(result.item)
             elif result.result_type==RESULT_REMOVE_ITEM:
-                self.protagonist.add_inventory_item(result.item)
+                self.protagonist.remove_inventory_item(result.item)
             elif result.result_type==RESULT_REMOVE_NPC:
                 if self.mode==MODE_CUT_SCENE:
                     self.mode=MODE_CUT_SCENE_REMOVE
