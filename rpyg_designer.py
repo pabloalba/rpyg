@@ -911,6 +911,7 @@ class  RPYG_Designer:
     def load_tokens(self):
         self.init_iconview_tokens()
         self.builder.get_object('token_name').set_text('')
+        self.builder.get_object('token_description_buffer').set_text('')
         self.builder.get_object('token_area').set_sensitive(False)
         if (len(self.game.tokens) != 0 ):
             #Load tokens
@@ -1001,6 +1002,7 @@ class  RPYG_Designer:
         self.builder.get_object('token_area').set_sensitive(True)
         #Write token properties
         self.builder.get_object('token_name').set_text(token.name)
+        self.builder.get_object('token_description_buffer').set_text(token.description)
         
     def load_item_properties(self, item):
         self.builder.get_object('item_area').set_sensitive(True)
@@ -1757,6 +1759,11 @@ class  RPYG_Designer:
                 self.token.name = name
                 pos = selected[0][0]
                 self.liststore_tokens[pos][1]=name
+                
+    def on_token_description_changed(self, field, event):
+        buff = description = self.builder.get_object('token_description_buffer')
+        description = buff.get_text(buff.get_start_iter(), buff.get_end_iter())
+        self.token.description = description
                 
     def on_item_name_changed(self, field):
         name = field.get_text()

@@ -129,6 +129,7 @@ class Token():
     def __init__(self, name, game):
         self.name=name
         self.game=game
+        self.description = ''
             
 # ---------------------------------------------------------------------
  
