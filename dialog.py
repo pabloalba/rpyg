@@ -35,7 +35,7 @@ class Result:
         self.result_type=result_type
         self.item=None
         self.token=None
-        self.pos=[]
+        self.pos=[0,0]
         
     def set_item(self,item):
         self.item=item

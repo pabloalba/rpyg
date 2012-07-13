@@ -142,6 +142,8 @@ class  RPYG_Designer:
         self.builder.get_object('btn_exit_map').set_image(image)
         image = gtk.image_new_from_pixbuf(icon)
         self.builder.get_object('btn_destiny_map').set_image(image)
+        image = gtk.image_new_from_pixbuf(icon)
+        self.builder.get_object('btn_result_map').set_image(image)
 
         icon  = self.load_image(os.path.join('images','dialog.png'), 90)
         image = gtk.image_new_from_pixbuf(icon)
@@ -1313,6 +1315,7 @@ class  RPYG_Designer:
         self.init_iconview_phrase()
         self.init_iconview_conditions()
         self.init_iconview_results()
+        self.clear_result_properties()
                 
         #Load phrases
         for p in dialog.phrases:
@@ -1353,6 +1356,15 @@ class  RPYG_Designer:
         self.builder.get_object('lbl_select_item').set_sensitive(False)
         self.builder.get_object('btn_result_item').set_sensitive(False)
         
+        self.builder.get_object('lbl_result_coord').set_sensitive(False)
+        self.builder.get_object('lbl_result_x').set_sensitive(False)
+        self.builder.get_object('lbl_result_y').set_sensitive(False)
+        self.builder.get_object('result_x').set_sensitive(False)
+        self.builder.get_object('result_y').set_sensitive(False)
+        self.builder.get_object('result_x').set_text('')
+        self.builder.get_object('result_y').set_text('')
+        self.builder.get_object('btn_result_map').set_sensitive(False)
+        
             
     def load_result_properties(self, result):
         self.clear_result_properties()
@@ -1360,17 +1372,21 @@ class  RPYG_Designer:
         combo = self.builder.get_object('cmb_results')
         combo.set_active(result.result_type)
         self.on_cmb_results_changed(combo)
-        
-        if (result.item):
+        t = result.result_type
+        if (t == rpyg_utils.RESULT_ADD_ITEM or t == rpyg_utils.RESULT_REMOVE_ITEM):
             icon  = self.load_image(result.item.image_url, 32, 32)
             image = gtk.image_new_from_pixbuf(icon)
             self.builder.get_object('btn_result_item').set_image(image)
             self.builder.get_object('btn_result_item').set_label(result.item.name)
-        elif (result.token):
+        elif (t == rpyg_utils.RESULT_ADD_TOKEN or t == rpyg_utils.RESULT_REMOVE_TOKEN):
             icon  = self.load_image(os.path.join('images','token.png'), 32, 32)
             image = gtk.image_new_from_pixbuf(icon)
             self.builder.get_object('btn_result_token').set_image(image)
             self.builder.get_object('btn_result_token').set_label(result.token.name)
+        elif (t == rpyg_utils.RESULT_MOVE_NPC):
+            self.builder.get_object('result_x').set_text(str(result.pos[0]))
+            self.builder.get_object('result_y').set_text(str(result.pos[1]))
+            
         
             
     def on_cmb_results_changed(self, combo):
@@ -1384,6 +1400,13 @@ class  RPYG_Designer:
         elif (t == rpyg_utils.RESULT_ADD_ITEM or t == rpyg_utils.RESULT_REMOVE_ITEM):
             self.builder.get_object('lbl_select_item').set_sensitive(True)
             self.builder.get_object('btn_result_item').set_sensitive(True)
+        elif (t == rpyg_utils.RESULT_MOVE_NPC):
+            self.builder.get_object('lbl_result_coord').set_sensitive(True)
+            self.builder.get_object('lbl_result_x').set_sensitive(True)
+            self.builder.get_object('lbl_result_y').set_sensitive(True)
+            self.builder.get_object('result_x').set_sensitive(True)
+            self.builder.get_object('result_y').set_sensitive(True)
+            self.builder.get_object('btn_result_map').set_sensitive(True)
             
             
             
@@ -1475,6 +1498,27 @@ class  RPYG_Designer:
         token = self.game.add_token(name)
         liststore_icon = self.create_token_icon(token)
         self.builder.get_object('iconview_conditions').get_model().append(liststore_icon)
+                
+                
+                
+                
+    def btn_result_map_clicked(self, button):
+        self.btn_map_clicked(button, self.on_btn_result_map_clicked, self.result.pos[0], self.result.pos[1])
+        
+    def on_btn_result_map_clicked(self,screenmap,event):
+        field_x = self.builder.get_object('result_x')
+        field_y = self.builder.get_object('result_y')
+        self.result.pos = self.on_map_clicked(screenmap, event, field_x, field_y)
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
                 
 
 #~ 
