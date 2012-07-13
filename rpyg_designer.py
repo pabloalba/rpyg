@@ -168,6 +168,10 @@ class  RPYG_Designer:
         image = gtk.image_new_from_pixbuf(icon)
         self.builder.get_object('btn_add_token').set_image(image)
         
+        icon  = self.load_image(os.path.join('images','help.png'), 25)
+        self.builder.get_object('img_hlp_conditions').set_from_pixbuf(icon)
+        
+        
         
         
         self.builder.get_object('box_conditions').modify_bg(gtk.STATE_NORMAL, gtk.gdk.Color('#606060'))
@@ -182,7 +186,7 @@ class  RPYG_Designer:
         
 
 
-        self.liststore_maps = None
+        self.liststore_screens = None
         self.liststore_npcs = None
         self.liststore_exits = None
         self.liststore_tokens = None
@@ -236,8 +240,8 @@ class  RPYG_Designer:
 
 
         # set liststore
-        if (self.liststore_maps):
-            liststore = self.liststore_maps
+        if (self.liststore_screens):
+            liststore = self.liststore_screens
             liststore.clear()
         else:
             liststore = gtk.ListStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING)
@@ -249,7 +253,7 @@ class  RPYG_Designer:
 
         #set liststore
         iconview.set_model(liststore)
-        self.liststore_maps = liststore
+        self.liststore_screens = liststore
 
         #assign event
         iconview.connect('selection_changed', self.on_icon_map_clicked)
@@ -491,6 +495,34 @@ class  RPYG_Designer:
                 self.open_map_dialog(None)
             else:
                 self.load_screen(pos-1)
+                
+                
+    def on_iconview_maps_key_release_event(self, iconview, event):
+        if event.keyval == 65535:
+            selected = self.builder.get_object('iconview_maps').get_selected_items()
+            if (len(selected) == 1):
+                pos = selected[0][0]
+                if pos>0:
+                    screen = self.game.screens[pos-1]
+                    if self.show_confirm('Do you want to delete the screen "'+screen.name+'"?'):
+                        self.screen = None
+                        self.game.screens.remove(screen)
+                        element = self.liststore_screens.get_iter(pos)
+                        self.liststore_screens.remove(element)
+                        self.init_iconview_maps()
+                        self.load_screens()
+                        self.builder.get_object('screen_properties').set_sensitive(False)
+                        self.builder.get_object('other_properties').set_sensitive(False)
+                        self.load_map_image(os.path.join('images','void.png'))                        
+                        self.liststore_npcs.clear()                        
+                        self.builder.get_object('prot_name').set_text('')
+                        self.builder.get_object('prot_x').set_text('')
+                        self.builder.get_object('prot_y').set_text('')
+                        self.load_prot_chara(self.builder.get_object('btn_prot_image_chara'), None)
+                        self.actor_load_image_dialog(self.builder.get_object('btn_prot_image_dialogs'), None)
+                        self.builder.get_object('txt_screen_name').set_text('')
+                        self.builder.get_object('txt_screen_music').set_text('')
+                        
 
     def on_icon_npc_clicked(self, iconview):
         selected = iconview.get_selected_items()
@@ -502,6 +534,22 @@ class  RPYG_Designer:
             else:
                 self.npc = self.screen.npcs[pos-1]
                 self.load_npc_properties(self.npc)
+                
+    def on_iconview_npcs_key_release_event(self, iconview, event):
+        if event.keyval == 65535:
+            selected = self.builder.get_object('iconview_npcs').get_selected_items()
+            if (len(selected) == 1):
+                pos = selected[0][0]
+                if pos>0:
+                    npc = self.screen.npcs[pos-1]
+                    if self.show_confirm('Do you want to delete the npc "'+npc.name+'"?'):
+                        self.npc = None
+                        self.screen.npcs.remove(npc)
+                        element = self.liststore_npcs.get_iter(pos)
+                        self.liststore_npcs.remove(element)
+                        self.load_npcs()
+                
+        
 
     def on_icon_exit_clicked(self, iconview):
         selected = iconview.get_selected_items()
@@ -523,13 +571,10 @@ class  RPYG_Designer:
                 self.s_exit = self.screen.exits[pos-1]
                 self.load_exit_properties(self.s_exit)
                 
-    def create_token(self):
-        name = "token "+str(len(self.game.tokens)+1)
-        token = self.game.add_token(name)
-        
+    def create_token_icon(self, token):
         #add token icon
         pixbuf = self.load_image(os.path.join("images","token.png"), 32, 32)
-        liststore_item = [pixbuf, name]
+        liststore_item = [pixbuf, token.name]
         self.liststore_tokens.append(liststore_item)
         return liststore_item
         
@@ -540,7 +585,12 @@ class  RPYG_Designer:
             pos = selected[0][0]
             #if it is the first icon, add token
             if (pos == 0):
+                name = "token "+str(len(self.game.tokens)+1)
+                token = self.game.add_token(name)
                 self.token = token
+                
+                self.create_token_icon(token)
+                
                 #Select last element
                 pos = len(self.game.tokens)
                 self.builder.get_object('iconview_tokens').select_path((pos,))
@@ -549,6 +599,51 @@ class  RPYG_Designer:
             else:
                 self.token = self.game.tokens[pos-1]
                 self.load_token_properties(self.token)
+                
+                
+                
+    def on_iconview_tokens_key_release_event(self, iconview, event):
+        if event.keyval == 65535:
+            selected = iconview.get_selected_items()
+            if (len(selected) == 1):
+                pos = selected[0][0]      
+                if (pos>0):          
+                    token = self.game.tokens[pos-1]
+                    
+                    can_delete = True
+                    names = ''
+                    conditions = ''
+                    for screen in self.game.screens:
+                        for npc in screen.npcs:
+                            for dialog in npc.dialogs:
+                                for result in dialog.results:
+                                    if (result.token == token):
+                                        can_delete = False
+                                        names += '\n    -'+screen.name+' > '+npc.name+' > '+dialog.name+' > '+result.name
+                                for condition in dialog.conditions:
+                                    if (condition == token):
+                                        can_delete = False
+                                        conditions += '\n    -'+screen.name+' > '+npc.name+' > '+dialog.name
+                                    
+                    if can_delete:
+                        if self.show_confirm('Do you want to delete the token "'+token.name+'"?'):
+                            self.token = None
+                            self.game.tokens.remove(token)
+                            self.init_iconview_tokens()
+                            self.load_tokens()
+                    else:
+                        text = "The token can't be deleted because it is used on"
+                        if (conditions):
+                            text+="\n\n* The conditions for:"+conditions
+                        if (names):
+                            text+="\n\n* The results:"+names
+                        
+                        
+                        self.show_error(text)
+                        
+                        
+                        
+                        
                 
     def on_icon_result_clicked(self, iconview):
         selected = iconview.get_selected_items()
@@ -572,6 +667,20 @@ class  RPYG_Designer:
                 self.result = self.dialog.results[pos-1]
                 self.load_result_properties(self.result)
                 
+                
+    def on_iconview_results_key_release_event(self, iconview, event):
+        if event.keyval == 65535:
+            selected = iconview.get_selected_items()
+            if (len(selected) == 1):
+                pos = selected[0][0] 
+                if (pos>0):               
+                    result = self.dialog.results[pos-1]
+                    if self.show_confirm('Do you want to delete the result "'+result.name+'"?'):
+                        self.result = None
+                        self.dialog.results.remove(result)
+                        self.load_dialog_properties(self.dialog)             
+                
+                
     def on_icon_item_clicked(self, iconview):
         selected = iconview.get_selected_items()
         if (len(selected) == 1):
@@ -582,6 +691,35 @@ class  RPYG_Designer:
             else:
                 self.item = self.game.items[pos-1]
                 self.load_item_properties(self.item)
+                
+                
+    def on_iconview_items_key_release_event(self, iconview, event):
+        if event.keyval == 65535:
+            selected = iconview.get_selected_items()
+            if (len(selected) == 1):
+                pos = selected[0][0]      
+                if (pos>0):          
+                    item = self.game.items[pos-1]
+                    
+                    can_delete = True
+                    names = ''
+                    for screen in self.game.screens:
+                        for npc in screen.npcs:
+                            for dialog in npc.dialogs:
+                                for result in dialog.results:
+                                    if (result.item == item):
+                                        can_delete = False
+                                        names += '\n    -'+screen.name+' > '+npc.name+' > '+dialog.name+' > '+result.name
+                                    
+                    if can_delete:
+                        if self.show_confirm('Do you want to delete the item "'+item.name+'"?'):
+                            self.item = None
+                            self.game.items.remove(item)
+                            self.init_iconview_items()
+                            self.load_items()
+                    else:
+                        self.show_error("The item can't be deleted because it is used on the results:\n"+names)
+                    
                 
     def on_icon_dialog_clicked(self, iconview):        
         selected = iconview.get_selected_items()
@@ -604,6 +742,20 @@ class  RPYG_Designer:
             else:                
                 self.dialog = self.npc.dialogs[pos-1]
                 self.load_dialog_properties(self.dialog)
+                
+                
+    def on_iconview_dialogs_key_release_event(self, iconview, event):
+        if event.keyval == 65535:
+            selected = iconview.get_selected_items()
+            if (len(selected) == 1):
+                pos = selected[0][0]     
+                if pos>0:           
+                    dialog = self.npc.dialogs[pos-1]
+                    if self.show_confirm('Do you want to delete the dialog "'+dialog.name+'"?'):
+                        self.dialog = None
+                        self.npc.dialogs.remove(dialog)
+                        self.load_dialogs()
+                    
 
 
     def on_exit_keep_toggled(self, button):
@@ -626,6 +778,18 @@ class  RPYG_Designer:
     def open_map_dialog(self,button):
         filename = self.open_file('*.png')
         if (filename):
+            
+            screen_map  = self.load_image(filename)
+            
+            #Get size
+            width = screen_map.get_width()
+            height = screen_map.get_height()
+            
+            if (width != 1024) or (height != 768):
+                self.show_error ("Screen file not valid. Must be an image of 1024x768 pixels")
+                return None
+            
+            
             #Create new screen
             screen_name = str(os.path.basename(filename))[0:-4]
 
@@ -641,7 +805,7 @@ class  RPYG_Designer:
             screen.map_file = filename
 
             screen_icon  = self.load_image(filename, 144, 90)
-            self.liststore_maps.append([screen_icon, screen_name])
+            self.liststore_screens.append([screen_icon, screen_name])
 
             #resize iconview
             self.builder.get_object('iconview_maps').set_size_request(200*len(self.game.screens),90)
@@ -729,6 +893,7 @@ class  RPYG_Designer:
         self.builder.get_object('npc_name').set_text('')
         self.builder.get_object('npc_x').set_text('')
         self.builder.get_object('npc_y').set_text('')
+        self.actor_load_image_dialog(self.builder.get_object('btn_npc_image_dialogs'), os.path.join('images','void.png'))
         self.init_iconview_npcs()
         if (len(self.screen.npcs) != 0 ):
             #Load npcs
@@ -752,8 +917,10 @@ class  RPYG_Designer:
         self.init_iconview_dialogs()
         self.init_iconview_conditions()
         self.init_iconview_results()
+        self.init_iconview_phrase()
         self.builder.get_object('dialog_name').set_text('')
         self.builder.get_object('dialog_area').set_sensitive(False)
+        
         if (len(self.npc.dialogs) != 0 ):
             #Load dialogs
             i = 0
@@ -863,13 +1030,14 @@ class  RPYG_Designer:
 
     def btn_prot_image_chara_clicked(self, button):
         filename = self.open_file('*.png')
-        pixbuf = self.set_actor_chara(self.screen.protagonist, filename)
-        if (pixbuf):
-            self.load_prot_chara(button, filename)
+        if (filename):
+            pixbuf = self.set_actor_chara(self.screen.protagonist, filename)
+            if (pixbuf):
+                self.load_prot_chara(button, filename)
 
     def load_prot_chara(self, button, filename):
         if not filename:
-            filename = os.path.join('images','default_dialog_img')
+            filename = os.path.join('images','default_chara.png')
         pixbuf = gtk.gdk.pixbuf_new_from_file(filename)
         image = gtk.image_new_from_pixbuf(pixbuf.subpixbuf(0, 0, 32, 48))
         button.set_image(image)
@@ -945,7 +1113,7 @@ class  RPYG_Designer:
 
 
     def btn_destiny_map_clicked(self, button):
-        self.show_window_select(self.liststore_maps, self.on_btn_destiny_ok_clicked, self.on_btn_destiny_cancel_clicked)
+        self.show_window_select(self.liststore_screens, self.on_btn_destiny_ok_clicked, self.on_btn_destiny_cancel_clicked)
 
     def on_btn_destiny_cancel_clicked(self, button):
         pass
@@ -975,33 +1143,35 @@ class  RPYG_Designer:
 
     #actors
     def set_actor_chara(self, actor, filename):
-        try:
-            pixbuf = gtk.gdk.pixbuf_new_from_file(filename)
-            #Get size
-            width = pixbuf.get_width()
-            height = pixbuf.get_height()
-            
-            if (width % 32 != 0) or (height % 48 != 0):
+        if (filename):
+            try:
+                pixbuf = gtk.gdk.pixbuf_new_from_file(filename)
+                #Get size
+                width = pixbuf.get_width()
+                height = pixbuf.get_height()
+                
+                if (width % 32 != 0) or (height % 48 != 0):
+                    self.show_error ("Chara file not valid. Must be an image of 32x48 charas")
+                    return None
+                
+                actor.max_rows = width / 32
+                actor.max_cols = height / 48
+                actor.img_file = filename
+                return pixbuf
+            except:
                 self.show_error ("Chara file not valid. Must be an image of 32x48 charas")
                 return None
-            
-            actor.max_rows = width / 32
-            actor.max_cols = height / 48
-            actor.img_file = filename
-            return pixbuf
-        except:
-            self.show_error ("Chara file not valid. Must be an image of 32x48 charas")
-            return None
 
     def btn_image_dialogs_clicked(self, button, actor):
         filename = self.open_file('*.png *.jpg')
-        self.actor_load_image_dialog(button, filename)
-        actor.img_dialog = filename
+        if (filename):
+            self.actor_load_image_dialog(button, filename)
+            actor.img_dialog = filename
 
 
     def actor_load_image_dialog(self, button, filename):
         if not filename:
-            filename = os.path.join('images','default_dialog_img')
+            filename = os.path.join('images','default_dialog_img.png')
         icon  = self.load_image(filename, 90)
         image = gtk.image_new_from_pixbuf(icon)
         button.set_image(image)
@@ -1053,10 +1223,10 @@ class  RPYG_Designer:
         subpixbuf = pixbuf.subpixbuf(0, 0, 32, 48)
         self.builder.get_object('img_dialog_prot_chara').set_from_pixbuf(subpixbuf)
         
-        pixbuf = gtk.gdk.pixbuf_new_from_file(self.screen.protagonist.img_dialog)
+        pixbuf = self.load_image(self.screen.protagonist.img_file, 90)
         self.builder.get_object('img_dialog_prot').set_from_pixbuf(pixbuf)
         
-        pixbuf = gtk.gdk.pixbuf_new_from_file(self.npc.img_dialog)
+        pixbuf = self.load_image(self.npc.img_dialog, 90)
         self.builder.get_object('img_dialog_npc').set_from_pixbuf(pixbuf)
         
         self.builder.get_object('lbl_dialogs_with').set_text('Dialogs with '+self.npc.name)
@@ -1101,6 +1271,22 @@ class  RPYG_Designer:
             pos = selected[0][0]
             self.phrase = self.dialog.phrases[pos]
             self.load_phrase_properties(self.phrase)
+            
+            
+    def on_iconview_phrase_key_release_event(self, iconview, event):
+        if event.keyval == 65535:
+            selected = iconview.get_selected_items()
+            if (len(selected) == 1):
+                pos = selected[0][0]                
+                phrase = self.dialog.phrases[pos]
+                if self.show_confirm('Do you want to delete the phrase "'+phrase.text+'"?'):
+                    self.phrase = None
+                    self.dialog.phrases.remove(phrase)
+                    self.load_dialog_properties(self.dialog)
+                    
+                
+                
+                    
             
     def on_phrase_changed(self, field):
         if (field.get_text()):            
@@ -1277,8 +1463,10 @@ class  RPYG_Designer:
         
         
     def on_btn_add_token_clicked(self, button):
-        liststore_item = self.create_token()
-        self.builder.get_object('iconview_conditions').get_model().append(liststore_item)
+        name = "token "+str(len(self.game.tokens)+1)
+        token = self.game.add_token(name)
+        liststore_icon = self.create_token_icon(token)
+        self.builder.get_object('iconview_conditions').get_model().append(liststore_icon)
                 
 
 #~ 
@@ -1373,8 +1561,8 @@ class  RPYG_Designer:
                 store.remove(row.iter)
 
     def clear_current(self):
-        if self.liststore_maps:
-            self.clear_store(self.liststore_maps)
+        if self.liststore_screens:
+            self.clear_store(self.liststore_screens)
         if self.liststore_npcs:
             self.clear_store(self.liststore_npcs)
         if self.liststore_exits:
@@ -1420,7 +1608,7 @@ class  RPYG_Designer:
     def load_screens(self):
         for screen in self.game.screens:
             screen_icon  = self.load_image(screen.map_file, 144, 90)
-            self.liststore_maps.append([screen_icon, screen.name])
+            self.liststore_screens.append([screen_icon, screen.name])
 
     def save_game_as(self,button):
         self.game_filename = self.save_file('*.rpyg')
@@ -1532,7 +1720,7 @@ class  RPYG_Designer:
             selected = self.builder.get_object('iconview_maps').get_selected_items()
             if (len(selected) == 1):
                 pos = selected[0][0]
-                self.liststore_maps[pos][1]=self.screen.name
+                self.liststore_screens[pos][1]=self.screen.name
 
 
     def prot_name_change(self, field):
@@ -1629,6 +1817,14 @@ class  RPYG_Designer:
             gtk.BUTTONS_CLOSE, text)
         md.run()
         md.destroy()
+        
+    def show_confirm(self, text):
+        md = gtk.MessageDialog(None,
+            gtk.DIALOG_DESTROY_WITH_PARENT, gtk.MESSAGE_INFO,
+            gtk.BUTTONS_YES_NO, text)
+        response = md.run()
+        md.destroy()
+        return response == gtk.RESPONSE_YES
 
     def closeMessage(self, text):
         self.builder.get_object('dlgMessage').set_visible(False)

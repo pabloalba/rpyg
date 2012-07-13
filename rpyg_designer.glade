@@ -54,6 +54,7 @@
                   <object class="GtkIconView" id="iconview_dialogs">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <signal name="key-release-event" handler="on_iconview_dialogs_key_release_event" swapped="no"/>
                   </object>
                 </child>
               </object>
@@ -163,6 +164,7 @@
                                   <object class="GtkIconView" id="iconview_results">
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
+                                    <signal name="key-release-event" handler="on_iconview_results_key_release_event" swapped="no"/>
                                   </object>
                                 </child>
                               </object>
@@ -372,6 +374,7 @@
                                   <object class="GtkIconView" id="iconview_phrase">
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
+                                    <signal name="key-release-event" handler="on_iconview_phrase_key_release_event" swapped="no"/>
                                   </object>
                                 </child>
                               </object>
@@ -443,7 +446,7 @@
                         <property name="border_width">2</property>
                         <child>
                           <object class="GtkLabel" id="label30">
-                            <property name="width_request">193</property>
+                            <property name="width_request">166</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">If the protagonist
@@ -454,14 +457,13 @@ has the tokens...
                             </attributes>
                           </object>
                           <packing>
-                            <property name="x">15</property>
                             <property name="y">6</property>
                           </packing>
                         </child>
                         <child>
                           <object class="GtkScrolledWindow" id="scrolledwindow6">
                             <property name="width_request">160</property>
-                            <property name="height_request">330</property>
+                            <property name="height_request">391</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="hscrollbar_policy">never</property>
@@ -500,20 +502,16 @@ has the tokens...
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkButton" id="btn_add_token">
-                            <property name="label" translatable="yes">Add new token</property>
-                            <property name="use_action_appearance">False</property>
-                            <property name="width_request">160</property>
-                            <property name="height_request">40</property>
+                          <object class="GtkImage" id="img_hlp_conditions">
+                            <property name="width_request">32</property>
+                            <property name="height_request">32</property>
                             <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="receives_default">True</property>
-                            <property name="use_action_appearance">False</property>
-                            <signal name="clicked" handler="on_btn_add_token_clicked" swapped="no"/>
+                            <property name="can_focus">False</property>
+                            <property name="tooltip_text" translatable="yes">You can select multiple or unselect tokens using Ctrl+Click</property>
                           </object>
                           <packing>
-                            <property name="x">26</property>
-                            <property name="y">393</property>
+                            <property name="x">174</property>
+                            <property name="y">14</property>
                           </packing>
                         </child>
                       </object>
@@ -599,6 +597,22 @@ has the tokens...
             <property name="y">415</property>
           </packing>
         </child>
+        <child>
+          <object class="GtkButton" id="btn_add_token">
+            <property name="label" translatable="yes">Add new token</property>
+            <property name="use_action_appearance">False</property>
+            <property name="width_request">100</property>
+            <property name="height_request">30</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="use_action_appearance">False</property>
+            <signal name="clicked" handler="on_btn_add_token_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="x">61</property>
+            <property name="y">726</property>
+          </packing>
+        </child>
       </object>
     </child>
   </object>
@@ -620,7 +634,7 @@ has the tokens...
     <property name="height_request">768</property>
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="title" translatable="yes">RPyg Designer</property>
+    <property name="title" translatable="yes">RPyG Designer</property>
     <property name="resizable">False</property>
     <property name="window_position">center</property>
     <property name="default_width">1024</property>
@@ -821,6 +835,7 @@ has the tokens...
                             <property name="height_request">150</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
+                            <signal name="key-release-event" handler="on_iconview_maps_key_release_event" swapped="no"/>
                           </object>
                         </child>
                       </object>
@@ -1250,6 +1265,7 @@ Right button inverts selection.</property>
                                                       <object class="GtkIconView" id="iconview_npcs">
                                                         <property name="visible">True</property>
                                                         <property name="can_focus">True</property>
+                                                        <signal name="key-release-event" handler="on_iconview_npcs_key_release_event" swapped="no"/>
                                                       </object>
                                                     </child>
                                                   </object>
@@ -1865,6 +1881,7 @@ on the inventory, and the tokens</property>
                           <object class="GtkIconView" id="iconview_items">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
+                            <signal name="key-release-event" handler="on_iconview_items_key_release_event" swapped="no"/>
                           </object>
                         </child>
                       </object>
@@ -1943,6 +1960,7 @@ on the inventory, and the tokens</property>
                           <object class="GtkIconView" id="iconview_tokens">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
+                            <signal name="key-release-event" handler="on_iconview_tokens_key_release_event" swapped="no"/>
                           </object>
                         </child>
                       </object>
@@ -2010,10 +2028,10 @@ on the inventory, and the tokens</property>
     </child>
   </object>
   <object class="GtkWindow" id="win_select">
-    <property name="width_request">800</property>
-    <property name="height_request">600</property>
+    <property name="width_request">600</property>
+    <property name="height_request">440</property>
     <property name="can_focus">False</property>
-    <property name="title" translatable="yes">RPyG Designer: Select destiny screen</property>
+    <property name="title" translatable="yes">RPyG Designer: Select element</property>
     <property name="resizable">False</property>
     <property name="modal">True</property>
     <property name="window_position">center-always</property>
@@ -2025,8 +2043,8 @@ on the inventory, and the tokens</property>
         <property name="can_focus">False</property>
         <child>
           <object class="GtkScrolledWindow" id="scrolledwindow3">
-            <property name="width_request">800</property>
-            <property name="height_request">550</property>
+            <property name="width_request">600</property>
+            <property name="height_request">400</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="shadow_type">in</property>
@@ -2049,7 +2067,7 @@ on the inventory, and the tokens</property>
             <property name="label">gtk-ok</property>
             <property name="use_action_appearance">False</property>
             <property name="width_request">100</property>
-            <property name="height_request">30</property>
+            <property name="height_request">35</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
@@ -2058,8 +2076,8 @@ on the inventory, and the tokens</property>
             <signal name="clicked" handler="on_btn_select_ok_clicked" swapped="no"/>
           </object>
           <packing>
-            <property name="x">450</property>
-            <property name="y">560</property>
+            <property name="x">326</property>
+            <property name="y">405</property>
           </packing>
         </child>
         <child>
@@ -2067,7 +2085,7 @@ on the inventory, and the tokens</property>
             <property name="label">gtk-cancel</property>
             <property name="use_action_appearance">False</property>
             <property name="width_request">100</property>
-            <property name="height_request">30</property>
+            <property name="height_request">35</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
@@ -2076,8 +2094,8 @@ on the inventory, and the tokens</property>
             <signal name="clicked" handler="on_btn_select_cancel_clicked" swapped="no"/>
           </object>
           <packing>
-            <property name="x">250</property>
-            <property name="y">560</property>
+            <property name="x">127</property>
+            <property name="y">405</property>
           </packing>
         </child>
       </object>
