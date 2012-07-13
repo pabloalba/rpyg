@@ -245,6 +245,8 @@ class  RPYG_Designer:
             liststore.clear()
         else:
             liststore = gtk.ListStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING)
+            #assign event
+            iconview.connect('button-release-event', self.on_icon_map_clicked)
 
 
         #Add icon for 'add screen'
@@ -255,8 +257,7 @@ class  RPYG_Designer:
         iconview.set_model(liststore)
         self.liststore_screens = liststore
 
-        #assign event
-        iconview.connect('selection_changed', self.on_icon_map_clicked)
+        
 
         self.win_rpyg.show_all()
         
@@ -277,6 +278,8 @@ class  RPYG_Designer:
             liststore.clear()
         else:
             liststore = gtk.ListStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING)
+            #assign event
+            iconview.connect('button-release-event', self.on_icon_token_clicked)
 
 
         #Add icon for 'add token'
@@ -287,8 +290,7 @@ class  RPYG_Designer:
         iconview.set_model(liststore)
         self.liststore_tokens = liststore
 
-        #assign event
-        iconview.connect('selection_changed', self.on_icon_token_clicked)
+        
 
         self.win_rpyg.show_all()
         
@@ -310,6 +312,8 @@ class  RPYG_Designer:
             liststore.clear()
         else:
             liststore = gtk.ListStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING)
+            #assign event
+            iconview.connect('button-release-event', self.on_icon_item_clicked)
 
 
         #Add icon for 'add item'
@@ -320,8 +324,7 @@ class  RPYG_Designer:
         iconview.set_model(liststore)
         self.liststore_items = liststore
 
-        #assign event
-        iconview.connect('selection_changed', self.on_icon_item_clicked)
+        
 
         self.win_rpyg.show_all()
         
@@ -343,6 +346,8 @@ class  RPYG_Designer:
             liststore.clear()
         else:
             liststore = gtk.ListStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING)
+             #assign event
+            iconview.connect('button-release-event', self.on_icon_dialog_clicked)
 
 
         #Add icon for 'add dialog'
@@ -353,8 +358,7 @@ class  RPYG_Designer:
         iconview.set_model(liststore)
         self.liststore_dialogs = liststore
 
-        #assign event
-        iconview.connect('selection_changed', self.on_icon_dialog_clicked)
+       
 
     def init_iconview_phrase(self):
         # set basic properties
@@ -373,14 +377,15 @@ class  RPYG_Designer:
             liststore.clear()
         else:
             liststore = gtk.ListStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING)
+            #assign event
+            iconview.connect('button-release-event', self.on_icon_phrase_clicked)
 
 
         #set liststore
         iconview.set_model(liststore)
         self.liststore_phrase = liststore
         
-        #assign event
-        iconview.connect('selection_changed', self.on_icon_phrase_clicked)
+        
 
         self.builder.get_object('win_dialogs').show_all()
 
@@ -402,6 +407,8 @@ class  RPYG_Designer:
             liststore.clear()
         else:
             liststore = gtk.ListStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING)
+            #assign event
+            iconview.connect('button-release-event', self.on_icon_result_clicked)
 
 
         #Add icon for 'add result'
@@ -412,8 +419,7 @@ class  RPYG_Designer:
         iconview.set_model(liststore)
         self.liststore_results = liststore
 
-        #assign event
-        iconview.connect('selection_changed', self.on_icon_result_clicked)
+        
 
         self.win_rpyg.show_all()
         
@@ -435,6 +441,8 @@ class  RPYG_Designer:
             liststore.clear()
         else:
             liststore = gtk.ListStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING)
+            #assign event
+            iconview.connect('button-release-event', self.on_icon_npc_clicked)
 
 
 
@@ -446,8 +454,7 @@ class  RPYG_Designer:
         iconview.set_model(liststore)
         self.liststore_npcs = liststore
 
-        #assign event
-        iconview.connect('selection_changed', self.on_icon_npc_clicked)
+        
 
         self.win_rpyg.show_all()
 
@@ -468,6 +475,8 @@ class  RPYG_Designer:
             liststore.clear()
         else:
             liststore = gtk.ListStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING)
+            #assign event
+            iconview.connect('button-release-event', self.on_icon_exit_clicked)
 
 
 
@@ -479,20 +488,19 @@ class  RPYG_Designer:
         iconview.set_model(liststore)
         self.liststore_exits = liststore
 
-        #assign event
-        iconview.connect('selection_changed', self.on_icon_exit_clicked)
+        
 
         self.win_rpyg.show_all()
 
 
 
-    def on_icon_map_clicked(self, iconview):
+    def on_icon_map_clicked(self, iconview, event):
         selected = iconview.get_selected_items()
         if (len(selected) == 1):
             pos = selected[0][0]
             #if it is the first icon, open add dialog
             if (pos == 0):
-                self.open_map_dialog(None)
+                self.open_map_dialog()
             else:
                 self.load_screen(pos-1)
                 
@@ -506,9 +514,7 @@ class  RPYG_Designer:
                     screen = self.game.screens[pos-1]
                     if self.show_confirm('Do you want to delete the screen "'+screen.name+'"?'):
                         self.screen = None
-                        self.game.screens.remove(screen)
-                        element = self.liststore_screens.get_iter(pos)
-                        self.liststore_screens.remove(element)
+                        self.game.screens.remove(screen)                        
                         self.init_iconview_maps()
                         self.load_screens()
                         self.builder.get_object('screen_properties').set_sensitive(False)
@@ -524,7 +530,7 @@ class  RPYG_Designer:
                         self.builder.get_object('txt_screen_music').set_text('')
                         
 
-    def on_icon_npc_clicked(self, iconview):
+    def on_icon_npc_clicked(self, iconview, event):
         selected = iconview.get_selected_items()
         if (len(selected) == 1):
             pos = selected[0][0]
@@ -551,7 +557,7 @@ class  RPYG_Designer:
                 
         
 
-    def on_icon_exit_clicked(self, iconview):
+    def on_icon_exit_clicked(self, iconview, event):
         selected = iconview.get_selected_items()
         if (len(selected) == 1):
             pos = selected[0][0]
@@ -579,7 +585,7 @@ class  RPYG_Designer:
         return liststore_item
         
                 
-    def on_icon_token_clicked(self, iconview):
+    def on_icon_token_clicked(self, iconview, event):
         selected = iconview.get_selected_items()
         if (len(selected) == 1):
             pos = selected[0][0]
@@ -645,7 +651,7 @@ class  RPYG_Designer:
                         
                         
                 
-    def on_icon_result_clicked(self, iconview):
+    def on_icon_result_clicked(self, iconview, event):
         selected = iconview.get_selected_items()
         if (len(selected) == 1):
             pos = selected[0][0]
@@ -681,7 +687,7 @@ class  RPYG_Designer:
                         self.load_dialog_properties(self.dialog)             
                 
                 
-    def on_icon_item_clicked(self, iconview):
+    def on_icon_item_clicked(self, iconview, event):
         selected = iconview.get_selected_items()
         if (len(selected) == 1):
             pos = selected[0][0]
@@ -721,7 +727,7 @@ class  RPYG_Designer:
                         self.show_error("The item can't be deleted because it is used on the results:\n"+names)
                     
                 
-    def on_icon_dialog_clicked(self, iconview):        
+    def on_icon_dialog_clicked(self, iconview, event):        
         selected = iconview.get_selected_items()
         if (len(selected) == 1):
             pos = selected[0][0]
@@ -775,7 +781,7 @@ class  RPYG_Designer:
         self.load_exits()
 
 
-    def open_map_dialog(self,button):
+    def open_map_dialog(self):
         filename = self.open_file('*.png')
         if (filename):
             
@@ -1265,7 +1271,7 @@ class  RPYG_Designer:
     def load_phrase_properties(self, phrase):
         self.builder.get_object('phrase').set_text(phrase.text)
 
-    def on_icon_phrase_clicked(self, iconview):
+    def on_icon_phrase_clicked(self, iconview, event):
         selected = iconview.get_selected_items()
         if (len(selected) == 1):
             pos = selected[0][0]
@@ -1396,7 +1402,7 @@ class  RPYG_Designer:
 
             liststore = gtk.ListStore(gtk.gdk.Pixbuf, gobject.TYPE_STRING)
             
-            self.conditions_handler = iconview.connect('selection_changed', self.on_icon_conditions_clicked)
+            self.conditions_handler = iconview.connect('button-release-event', self.on_icon_conditions_clicked)
             
         else:
             liststore.clear()
@@ -1410,7 +1416,7 @@ class  RPYG_Designer:
 
         iconview.set_model(liststore)
         
-    def on_icon_conditions_clicked(self, iconview): 
+    def on_icon_conditions_clicked(self, iconview, event): 
         selected = iconview.get_selected_items()
         self.dialog.conditions = []
         if (len(selected) > 0):
